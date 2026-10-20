@@ -230,9 +230,9 @@ fn register(
         .get(param_ref.as_str())
         .cloned()
         .unwrap_or_default();
-    let compatible = saved.iter().any(|measurement| {
-        spec.length == 1 && !spec.as_enum && measurement.unit == spec.unit
-    });
+    let compatible = saved
+        .iter()
+        .any(|measurement| spec.length == 1 && !spec.as_enum && measurement.unit == spec.unit);
     if !saved.is_empty() && !compatible {
         finding(
             findings,

@@ -5,8 +5,7 @@ use std::path::PathBuf;
 
 #[test]
 fn pinned_openrgd_reference_has_expected_coverage_and_mismatched_ids() {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/openrgd-reference");
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/openrgd-reference");
     let bundle = BundleSource::load(&root).unwrap();
     let report = inspect_passive(&bundle, None, &InspectionContext::default()).unwrap();
     assert_eq!(report.model_id, "bhl_humanoid_lite_v2");
@@ -28,11 +27,9 @@ fn pinned_openrgd_reference_has_expected_coverage_and_mismatched_ids() {
         f.code == "orphan_component_reference" && f.reference.contains("right_wrist_ft")
     }));
     assert!(report.findings.iter().any(|f| {
-        f.code == "unresolved_cross_domain_reference"
-            && f.reference.contains("knee_pitch_right")
+        f.code == "unresolved_cross_domain_reference" && f.reference.contains("knee_pitch_right")
     }));
     assert!(report.findings.iter().any(|f| {
-        f.code == "unresolved_cross_domain_reference"
-            && f.reference.contains("wifi_rf_monitor")
+        f.code == "unresolved_cross_domain_reference" && f.reference.contains("wifi_rf_monitor")
     }));
 }

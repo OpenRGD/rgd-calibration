@@ -365,12 +365,14 @@ fn mismatched_units_are_not_counted_as_calibrated_observations() {
     let report = inspect_passive(&bundle, Some(&profile), &matching_context()).unwrap();
     assert_eq!(report.coverage.saved_evidence_fields, 0);
     assert!(report.export_preview.is_none());
-    assert!(report.findings.iter().any(|f| {
-        f.code == "incompatible_historical_measurement"
-    }));
-    assert!(report.findings.iter().any(|f| {
-        f.code == "correction_without_matching_measurement"
-    }));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| { f.code == "incompatible_historical_measurement" }));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| { f.code == "correction_without_matching_measurement" }));
 }
 
 #[test]
@@ -383,7 +385,8 @@ fn corrections_without_measurements_are_not_previewed() {
     let report = inspect_passive(&bundle, Some(&profile), &matching_context()).unwrap();
     assert!(report.export_preview.is_none());
     assert_eq!(report.coverage.saved_evidence_fields, 0);
-    assert!(report.findings.iter().any(|f| {
-        f.code == "correction_without_matching_measurement"
-    }));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| { f.code == "correction_without_matching_measurement" }));
 }
