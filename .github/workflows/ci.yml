@@ -15,16 +15,12 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - name: Generate dependency lockfile for reproducibility
-        run: |
-          cargo generate-lockfile
-          echo '===OPENRGD_LOCK_BEGIN==='
-          cat Cargo.lock
-          echo '===OPENRGD_LOCK_END==='
+      - name: Verify dependency lockfile
+        run: cargo metadata --locked --no-deps --format-version 1 > /dev/null
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run Clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets --locked -- -D warnings
       - name: Compile and test
         run: cargo test --all-targets --locked
       - name: Validate contract and manifest JSON syntax

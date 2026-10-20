@@ -27,16 +27,22 @@ pub enum CalibrationError {
 pub fn validate_profile_id(id: &str) -> Result<(), CalibrationError> {
     if id.is_empty()
         || id.len() > 128
-        || !id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+        || !id
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
     {
-        return Err(CalibrationError::Invalid("unsafe or empty profile_id".into()));
+        return Err(CalibrationError::Invalid(
+            "unsafe or empty profile_id".into(),
+        ));
     }
     Ok(())
 }
 
 fn require(s: &str, what: &str) -> Result<(), CalibrationError> {
     if s.trim().is_empty() {
-        return Err(CalibrationError::Invalid(format!("{what} must not be empty")));
+        return Err(CalibrationError::Invalid(format!(
+            "{what} must not be empty"
+        )));
     }
     Ok(())
 }
@@ -69,11 +75,15 @@ fn check_evidence_refs(
 /// Validate consistency of the record. This is NOT motor safety certification.
 pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
     if profile.schema_version != PROFILE_SCHEMA_VERSION {
-        return Err(CalibrationError::Invalid("unsupported profile schema version".into()));
+        return Err(CalibrationError::Invalid(
+            "unsupported profile schema version".into(),
+        ));
     }
     validate_profile_id(&profile.profile_id)?;
     if profile.previous_profile_id.as_deref() == Some(profile.profile_id.as_str()) {
-        return Err(CalibrationError::Invalid("profile cannot supersede itself".into()));
+        return Err(CalibrationError::Invalid(
+            "profile cannot supersede itself".into(),
+        ));
     }
     if let Some(previous) = &profile.previous_profile_id {
         validate_profile_id(previous)?;
@@ -81,7 +91,9 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
     require(&profile.physical_instance_id, "physical_instance_id")?;
     require(&profile.model_ref, "model_ref")?;
     if !sha256_digest_valid(&profile.model_sha256) {
-        return Err(CalibrationError::Invalid("model_sha256 must be sha256:hex64".into()));
+        return Err(CalibrationError::Invalid(
+            "model_sha256 must be sha256:hex64".into(),
+        ));
     }
     check_time(&profile.created_at, "created_at")?;
     if profile.mode == CalibrationMode::Active {
@@ -112,7 +124,9 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
     for hardware in &profile.hardware {
         require(&hardware.component_ref, "hardware.component_ref")?;
         if !device_ids.insert(hardware.component_ref.as_str()) {
-            return Err(CalibrationError::Invalid("duplicate hardware component_ref".into()));
+            return Err(CalibrationError::Invalid(
+                "duplicate hardware component_ref".into(),
+            ));
         }
         if let Some(uid) = &hardware.hardware_uid {
             require(uid, "hardware.hardware_uid")?;
@@ -145,7 +159,9 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
         }
         require(&correction.unit, "correction.unit")?;
         if !correction.value.is_finite() {
-            return Err(CalibrationError::Invalid("correction value must be finite".into()));
+            return Err(CalibrationError::Invalid(
+                "correction value must be finite".into(),
+            ));
         }
         check_evidence_refs(&correction.evidence_ids, &evidence_ids, "correction")?;
     }
@@ -153,7 +169,9 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
     for joint in &profile.joint_zero_references {
         require(&joint.joint_ref, "joint_zero_references.joint_ref")?;
         if !joint_ids.insert(joint.joint_ref.as_str()) {
-            return Err(CalibrationError::Invalid("duplicate joint reference".into()));
+            return Err(CalibrationError::Invalid(
+                "duplicate joint reference".into(),
+            ));
         }
         let angles = [
             joint.encoder_zero_rad,
@@ -163,7 +181,9 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
             joint.safe_rest_rad,
         ];
         if angles.iter().flatten().any(|value| !value.is_finite()) {
-            return Err(CalibrationError::Invalid("joint references must be finite".into()));
+            return Err(CalibrationError::Invalid(
+                "joint references must be finite".into(),
+            ));
         }
         if let Some(homing) = &joint.homing_procedure_ref {
             require(homing, "joint.homing_procedure_ref")?;
@@ -200,20 +220,23 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
             ));
         }
         let has_real_evidence = record.evidence_ids.iter().any(|id| {
-            profile.evidence.iter().any(|e| {
-                e.id == *id && e.origin.can_support_physical_validation()
-            })
+            profile
+                .evidence
+                .iter()
+                .any(|e| e.id == *id && e.origin.can_support_physical_validation())
         });
         if !has_real_evidence {
             return Err(CalibrationError::Invalid(
-                "simulated/derived/nominal evidence cannot alone validate a physical profile".into(),
+                "simulated/derived/nominal evidence cannot alone validate a physical profile"
+                    .into(),
             ));
         }
         for correction in &profile.corrections {
             let supported = correction.evidence_ids.iter().any(|id| {
-                profile.evidence.iter().any(|e| {
-                    e.id == *id && e.origin.can_support_physical_validation()
-                })
+                profile
+                    .evidence
+                    .iter()
+                    .any(|e| e.id == *id && e.origin.can_support_physical_validation())
             });
             if !supported {
                 return Err(CalibrationError::Invalid(format!(
@@ -260,10 +283,14 @@ pub fn check_bindings(
 ) -> Result<(), CalibrationError> {
     verify(profile)?;
     if physical_instance_id != profile.physical_instance_id {
-        return Err(CalibrationError::BindingMismatch("robot instance changed".into()));
+        return Err(CalibrationError::BindingMismatch(
+            "robot instance changed".into(),
+        ));
     }
     if model_sha256 != profile.model_sha256 {
-        return Err(CalibrationError::BindingMismatch("RGD model hash changed".into()));
+        return Err(CalibrationError::BindingMismatch(
+            "RGD model hash changed".into(),
+        ));
     }
     for expected in &profile.hardware {
         let found = discovered_hardware

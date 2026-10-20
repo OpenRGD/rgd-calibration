@@ -1,8 +1,8 @@
 use rgd_calibration::{
-    check_bindings, seal, transition, verify, CalibrationMode, CalibrationProfile,
-    CalibrationState, Correction, CorrectionOperation, Evidence, EvidenceOrigin, FileStore,
-    HardwareIdentity, JointZeroReference, Measurement, MeasurementKind, PositionObservation,
-    PositionReferenceKind, ValidationRecord, fork_for_recalibration,
+    check_bindings, fork_for_recalibration, seal, transition, verify, CalibrationMode,
+    CalibrationProfile, CalibrationState, Correction, CorrectionOperation, Evidence,
+    EvidenceOrigin, FileStore, HardwareIdentity, JointZeroReference, Measurement, MeasurementKind,
+    PositionObservation, PositionReferenceKind, ValidationRecord,
 };
 
 fn hash() -> String {
@@ -11,8 +11,11 @@ fn hash() -> String {
 
 fn sample_validated() -> CalibrationProfile {
     let mut p = CalibrationProfile::new(
-        "cal_0001", "robot_unit_1", "01_foundation/description.jsonc",
-        hash(), "2026-10-19T19:00:00Z",
+        "cal_0001",
+        "robot_unit_1",
+        "01_foundation/description.jsonc",
+        hash(),
+        "2026-10-19T19:00:00Z",
     );
     p.mode = CalibrationMode::Guided;
     p.state = CalibrationState::InProgress;
@@ -176,8 +179,7 @@ fn revision_fork_clears_old_evidence_and_preserves_immutable_parent() {
     let mut parent = sample_validated();
     seal(&mut parent).unwrap();
     store.save_new(&parent).unwrap();
-    let mut child =
-        fork_for_recalibration(&parent, "cal_0002", "2026-10-19T19:05:00Z").unwrap();
+    let mut child = fork_for_recalibration(&parent, "cal_0002", "2026-10-19T19:05:00Z").unwrap();
     assert_eq!(child.state, CalibrationState::CalibrationRequired);
     assert_eq!(child.previous_profile_id.as_deref(), Some("cal_0001"));
     assert_eq!(child.hardware, parent.hardware);
@@ -206,8 +208,7 @@ fn orphan_revision_is_not_persisted() {
     let store = FileStore::new(temp.path());
     let mut p = sample_validated();
     seal(&mut p).unwrap();
-    let mut child =
-        fork_for_recalibration(&p, "cal_0002", "2026-10-19T19:06:00Z").unwrap();
+    let mut child = fork_for_recalibration(&p, "cal_0002", "2026-10-19T19:06:00Z").unwrap();
     seal(&mut child).unwrap();
     assert!(store.save_new(&child).is_err());
 }

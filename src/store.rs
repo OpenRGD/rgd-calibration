@@ -34,9 +34,9 @@ impl FileStore {
             }
         }
         let destination = self.location(&profile.profile_id)?;
-        let directory = destination.parent().ok_or_else(|| {
-            CalibrationError::Invalid("profile store directory missing".into())
-        })?;
+        let directory = destination
+            .parent()
+            .ok_or_else(|| CalibrationError::Invalid("profile store directory missing".into()))?;
         fs::create_dir_all(directory)?;
         let mut temporary = tempfile::NamedTempFile::new_in(directory)?;
         serde_json::to_writer_pretty(temporary.as_file_mut(), profile)?;
