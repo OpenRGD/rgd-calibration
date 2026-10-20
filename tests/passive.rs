@@ -293,6 +293,7 @@ fn unrecognized_path_cannot_be_exported() {
     let mut profile = approved_profile();
     profile.corrections[0].parameter_ref =
         "kinematic_offsets_map.unknown_joint.zero_point_offset_rad_float".into();
+    profile.measurements[0].parameter_ref = profile.corrections[0].parameter_ref.clone();
     seal(&mut profile).unwrap();
     let report = inspect_passive(&bundle, Some(&profile), &matching_context()).unwrap();
     assert!(report.export_preview.is_none());
