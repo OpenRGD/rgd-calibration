@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openrgd.org/schemas/rgd-calibration/0.1.0/position-observation",
+  "title": "OpenRGD Ephemeral Position Observation v0.1.0 candidate",
+  "description": "NOT a persisted calibration nor a motion authorization; reboot-scoped physical reference claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "joint_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "boot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "position_rad": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reference_kind": {
+      "enum": [
+        "unknown",
+        "relative_only",
+        "absolute_encoder",
+        "verified_homing",
+        "external_measurement"
+      ]
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "joint_ref",
+    "boot_id",
+    "position_rad",
+    "reference_kind",
+    "evidence_ids"
+  ]
+}

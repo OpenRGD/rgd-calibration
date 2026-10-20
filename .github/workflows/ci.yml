@@ -1,0 +1,22 @@
+name: Foundation CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Compile and test
+        run: cargo test --all-targets
+      - name: Validate contract and manifest JSON syntax
+        run: |
+          python3 -m json.tool contracts/calibration-profile.v0.1.schema.json > /dev/null
+          python3 -m json.tool contracts/position-observation.v0.1.schema.json > /dev/null
+          python3 -m json.tool module.openrgd.json > /dev/null

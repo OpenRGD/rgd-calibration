@@ -1,0 +1,437 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openrgd.org/schemas/rgd-calibration/0.1.0/profile",
+  "title": "OpenRGD Calibration Profile v0.1.0 candidate",
+  "description": "Instance-specific measurement and correction record; integrity is not physical correctness or motion permission.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "profile_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,128}$"
+    },
+    "physical_instance_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-fA-F]{64}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "enum": [
+        "passive",
+        "guided",
+        "active"
+      ]
+    },
+    "state": {
+      "enum": [
+        "uncalibrated",
+        "calibration_required",
+        "in_progress",
+        "validated",
+        "degraded",
+        "expired",
+        "invalid"
+      ]
+    },
+    "hardware": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/HardwareIdentity"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      }
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Measurement"
+      }
+    },
+    "corrections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Correction"
+      }
+    },
+    "joint_zero_references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JointZeroReference"
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "validation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ValidationRecord"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "previous_profile_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,128}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "integrity_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-fA-F]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "profile_id",
+    "physical_instance_id",
+    "model_ref",
+    "model_sha256",
+    "created_at",
+    "mode",
+    "state",
+    "hardware",
+    "evidence",
+    "measurements",
+    "corrections",
+    "joint_zero_references",
+    "environment",
+    "validation",
+    "previous_profile_id",
+    "integrity_sha256"
+  ],
+  "$defs": {
+    "Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin": {
+          "enum": [
+            "physical_sensor",
+            "human_measurement",
+            "simulation",
+            "nominal_model",
+            "derived"
+          ]
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-fA-F]{64}$"
+        },
+        "chronon_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "origin",
+        "recorded_at",
+        "source_ref",
+        "content_sha256",
+        "chronon_ref"
+      ]
+    },
+    "HardwareIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "component_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hardware_uid": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firmware_fingerprint": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "component_ref",
+        "hardware_uid",
+        "firmware_fingerprint"
+      ]
+    },
+    "Measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parameter_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "observed",
+            "estimated"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "standard_uncertainty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "parameter_ref",
+        "kind",
+        "value",
+        "unit",
+        "standard_uncertainty",
+        "evidence_ids"
+      ]
+    },
+    "Correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parameter_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "enum": [
+            "additive_delta",
+            "multiplicative_factor",
+            "absolute_override"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "parameter_ref",
+        "operation",
+        "value",
+        "unit",
+        "evidence_ids"
+      ]
+    },
+    "JointZeroReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "joint_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encoder_zero_rad": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mechanical_zero_rad": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kinematic_zero_rad": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "initial_reference_rad": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "safe_rest_rad": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "homing_procedure_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "joint_ref",
+        "encoder_zero_rad",
+        "mechanical_zero_rad",
+        "kinematic_zero_rad",
+        "initial_reference_rad",
+        "safe_rest_rad",
+        "homing_procedure_ref",
+        "evidence_ids"
+      ]
+    },
+    "ValidationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "validated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "approver": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "passed",
+        "method",
+        "validated_at",
+        "approver",
+        "evidence_ids"
+      ]
+    }
+  }
+}

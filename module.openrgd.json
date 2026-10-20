@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "module_id": "org.openrgd.calibration",
+  "module_version": "0.1.0",
+  "name": "OpenRGD Calibration",
+  "runtime": "rust-library",
+  "registry_status": "proposal-only",
+  "non_actuating": true,
+  "automatic_motion_on_load": false,
+  "capabilities": [
+    "calibration.profile.validate",
+    "calibration.profile.seal",
+    "calibration.profile.persist",
+    "calibration.bindings.inspect"
+  ],
+  "active_calibration_supported": false,
+  "canonical_contract_refs": [
+    "https://github.com/OpenRGD/openrgd/blob/main/spec/01_foundation/calibration.jsonc",
+    "https://github.com/OpenRGD/openrgd/blob/main/spec/01_foundation/description.jsonc"
+  ]
+}
