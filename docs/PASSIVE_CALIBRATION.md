@@ -38,7 +38,8 @@ The BHL reference example currently contains mismatches (e.g. `knee_joint_right`
 Input: optional `CalibrationProfile` from CAL-0.1 (must pass `verify`), plus optional `InspectionContext` from the caller. A profile's `validated` state is a **provenance/approval claim**, not a verified robot. To render a preview, CAL-0.2 currently requires:
 - `profile.state == validated` with intact integrity seal and evidence links;
 - caller-supplied `physical_instance_id` and authoritative `model_sha256` exactly match the profile;
-- each scalar correction has an explicitly supported canonical field, joint ID, unit and operation.
+- each scalar correction has an explicitly supported canonical field, joint ID, unit and operation;
+- a saved scalar measurement with the same target path and unit is required before that correction can be previewed; arrays and enums from the Canonical Core cannot be inferred from CAL-0.1 scalar measurements.
 
 Only currently supported scalar preview paths:
 

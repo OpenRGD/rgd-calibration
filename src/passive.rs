@@ -230,7 +230,20 @@ fn register(
         .get(param_ref.as_str())
         .cloned()
         .unwrap_or_default();
-    let coverage = if !saved.is_empty() {
+    let compatible = saved.iter().any(|measurement| {
+        spec.length == 1 && !spec.as_enum && measurement.unit == spec.unit
+    });
+    if !saved.is_empty() && !compatible {
+        finding(
+            findings,
+            Severity::Warning,
+            "incompatible_historical_measurement",
+            "profile",
+            &param_ref,
+            "A stored scalar measurement has the wrong unit, or the canonical field requires an array/enum; never convert or assume equivalence.",
+        );
+    }
+    let coverage = if compatible {
         CoverageKind::SavedEvidence
     } else if declared.is_some() {
         CoverageKind::DeclaredOnly
@@ -392,6 +405,20 @@ fn build_preview(
     let mut patch = Map::new();
     let mut changes = Vec::new();
     for correction in &profile.corrections {
+        if !profile.measurements.iter().any(|measurement| {
+            measurement.parameter_ref == correction.parameter_ref
+                && measurement.unit == correction.unit
+        }) {
+            finding(
+                findings,
+                Severity::Warning,
+                "correction_without_matching_measurement",
+                "profile",
+                &correction.parameter_ref,
+                "No stored scalar measurement with an identical target path and unit; proposal is omitted.",
+            );
+            continue;
+        }
         let pieces: Vec<&str> = correction.parameter_ref.split('.').collect();
         if pieces.len() != 3 {
             finding(
@@ -761,10 +788,10 @@ pub fn inspect_passive(
         } else {
             counts.without_declared_values += 1;
         }
-        if param.stored_measurements.is_empty() {
-            counts.without_saved_measurements += 1;
-        } else {
+        if param.coverage == CoverageKind::SavedEvidence {
             counts.saved_evidence_fields += 1;
+        } else {
+            counts.without_saved_measurements += 1;
         }
     }
     if let (Some(calibration), Some(profile)) = (&bundle.calibration, profile) {

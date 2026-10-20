@@ -38,6 +38,23 @@ jobs:
           assert report["claims_physical_calibration_certified"] is False
           assert report["export_preview"] is None
           PY
+      - name: Canonical Core pinned reference regression (offline)
+        run: |
+          cargo run --bin rgd-calibration --locked -- inspect --bundle tests/fixtures/openrgd-reference > /tmp/rgd-reference-report.json
+          python3 - <<'PY'
+          import json
+          with open("/tmp/rgd-reference-report.json", encoding="utf-8") as f:
+              report = json.load(f)
+          assert report["model_id"] == "bhl_humanoid_lite_v2"
+          assert report["coverage"]["candidate_fields"] == 13
+          assert report["coverage"]["declared_fields"] == 8
+          assert report["coverage"]["saved_evidence_fields"] == 0
+          assert report["current_robot_position_observed"] is False
+          assert report["export_preview"] is None
+          codes = {x["code"] for x in report["findings"]}
+          assert "orphan_component_reference" in codes
+          assert "unresolved_cross_domain_reference" in codes
+          PY
       - name: Validate contract and manifest JSON syntax
         run: |
           python3 -m json.tool contracts/calibration-profile.v0.1.schema.json > /dev/null
