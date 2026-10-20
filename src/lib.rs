@@ -1,4 +1,4 @@
-//! OpenRGD Calibration Foundation v0.1.
+//! OpenRGD Calibration — CAL-0.1 foundation and CAL-0.2 passive inspection.
 //!
 //! Offline-first, non-actuating calibration records.
 //! No hardware drivers, command transport, or runtime motor authority.
@@ -6,7 +6,9 @@
 
 pub mod lifecycle;
 pub mod model;
+pub mod passive;
 pub mod revision;
+pub mod source;
 pub mod store;
 pub mod validation;
 

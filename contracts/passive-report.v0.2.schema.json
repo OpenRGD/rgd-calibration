@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openrgd.org/schemas/rgd-calibration/0.2.0/passive-report",
+  "title": "CAL-0.2 passive calibration inspection report (candidate)",
+  "description": "Read-only inventory and historical evidence claims; never a motion permit or physical calibration certificate.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "report_version": {
+      "const": "0.2.0"
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_digests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "raw_file_sha256": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "role",
+          "path",
+          "raw_file_sha256"
+        ]
+      }
+    },
+    "profile_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "profile_state": {
+      "anyOf": [
+        {
+          "enum": [
+            "uncalibrated",
+            "calibration_required",
+            "in_progress",
+            "validated",
+            "degraded",
+            "expired",
+            "invalid"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "profile_binding": {
+      "enum": [
+        "no_profile",
+        "missing_context",
+        "claimed_match",
+        "mismatch"
+      ]
+    },
+    "claims_physical_calibration_certified": {
+      "const": false
+    },
+    "current_robot_position_observed": {
+      "const": false
+    },
+    "physical_drift_evaluated": {
+      "const": false
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "candidate_fields": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "declared_fields": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "saved_evidence_fields": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "without_saved_measurements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "without_declared_values": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "candidate_fields",
+        "declared_fields",
+        "saved_evidence_fields",
+        "without_saved_measurements",
+        "without_declared_values"
+      ]
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "parameter_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "component_kind": {
+            "enum": [
+              "joint",
+              "sensor"
+            ]
+          },
+          "component_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nominal_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nominal_value": {},
+          "declared_value": {},
+          "stored_measurements": {
+            "type": "array",
+            "items": {
+              "$ref": "./calibration-profile.v0.1.schema.json#/$defs/Measurement"
+            }
+          },
+          "coverage": {
+            "enum": [
+              "absent",
+              "declared_only",
+              "saved_evidence"
+            ]
+          }
+        },
+        "required": [
+          "parameter_ref",
+          "component_kind",
+          "component_id",
+          "unit",
+          "nominal_ref",
+          "nominal_value",
+          "declared_value",
+          "stored_measurements",
+          "coverage"
+        ]
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "severity": {
+            "enum": [
+              "information",
+              "warning"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "severity",
+          "code",
+          "source",
+          "reference",
+          "detail"
+        ]
+      }
+    },
+    "export_preview": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "const": "candidate_only_no_auto_commit"
+            },
+            "applied": {
+              "const": false
+            },
+            "hardware_binding_verified": {
+              "const": false
+            },
+            "canonical_calibration_delta_patch": {
+              "type": "object"
+            },
+            "proposed_deltas": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "target": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operation": {
+                    "enum": [
+                      "additive_delta",
+                      "multiplicative_factor",
+                      "absolute_override"
+                    ]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "physical_verification_required": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "target",
+                  "operation",
+                  "value",
+                  "unit",
+                  "physical_verification_required"
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "status",
+            "applied",
+            "hardware_binding_verified",
+            "canonical_calibration_delta_patch",
+            "proposed_deltas"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "report_version",
+    "model_id",
+    "source_digests",
+    "profile_id",
+    "profile_state",
+    "profile_binding",
+    "claims_physical_calibration_certified",
+    "current_robot_position_observed",
+    "physical_drift_evaluated",
+    "coverage",
+    "parameters",
+    "findings",
+    "export_preview"
+  ]
+}

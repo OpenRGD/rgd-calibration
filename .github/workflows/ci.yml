@@ -23,8 +23,24 @@ jobs:
         run: cargo clippy --all-targets --locked -- -D warnings
       - name: Compile and test
         run: cargo test --all-targets --locked
+      - name: Passive inspection CLI smoke (synthetic only)
+        run: |
+          cargo run --bin rgd-calibration --locked -- inspect --bundle tests/fixtures/passive-minimal > /tmp/rgd-passive-report.json
+          python3 - <<'PY'
+          import json
+          with open("/tmp/rgd-passive-report.json", encoding="utf-8") as f:
+              report = json.load(f)
+          assert report["report_version"] == "0.2.0"
+          assert report["model_id"] == "synthetic_cli_fixture"
+          assert report["coverage"]["candidate_fields"] == 2
+          assert report["current_robot_position_observed"] is False
+          assert report["physical_drift_evaluated"] is False
+          assert report["claims_physical_calibration_certified"] is False
+          assert report["export_preview"] is None
+          PY
       - name: Validate contract and manifest JSON syntax
         run: |
           python3 -m json.tool contracts/calibration-profile.v0.1.schema.json > /dev/null
           python3 -m json.tool contracts/position-observation.v0.1.schema.json > /dev/null
           python3 -m json.tool module.openrgd.json > /dev/null
+          python3 -m json.tool contracts/passive-report.v0.2.schema.json > /dev/null
