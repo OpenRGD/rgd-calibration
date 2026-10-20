@@ -140,15 +140,31 @@ pub struct PositionObservation {
     pub joint_ref: String,
     pub boot_id: String,
     pub position_rad: Option<f64>,
+    /// Timestamp relative to this boot's monotonic clock; absent is unknown.
+    pub observed_at_monotonic_ns: Option<u64>,
     pub reference_kind: PositionReferenceKind,
     pub evidence_ids: Vec<String>,
 }
 
 impl PositionObservation {
-    /// Structural evidence check, not proof of sensor truth or authorization to move.
-    pub fn has_current_absolute_reference(&self, current_boot_id: &str) -> bool {
+    /// Checks a boot-scoped *claim* of a fresh absolute reference, not sensor
+    /// trust, metrological correctness, or permission to actuate. Both time
+    /// arguments must come from the same boot-scoped monotonic clock.
+    pub fn has_fresh_absolute_reference_claim(
+        &self,
+        current_boot_id: &str,
+        current_monotonic_ns: u64,
+        max_age_ns: u64,
+    ) -> bool {
+        let Some(observed_ns) = self.observed_at_monotonic_ns else {
+            return false;
+        };
+        let Some(age_ns) = current_monotonic_ns.checked_sub(observed_ns) else {
+            return false;
+        };
         !current_boot_id.is_empty()
             && self.boot_id == current_boot_id
+            && age_ns <= max_age_ns
             && matches!(
                 self.reference_kind,
                 PositionReferenceKind::AbsoluteEncoder

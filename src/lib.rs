@@ -6,6 +6,7 @@
 
 pub mod lifecycle;
 pub mod model;
+pub mod revision;
 pub mod store;
 pub mod validation;
 
@@ -16,5 +17,6 @@ pub use model::{
     MeasurementKind, PositionObservation, PositionReferenceKind, ValidationRecord,
     PROFILE_SCHEMA_VERSION,
 };
+pub use revision::fork_for_recalibration;
 pub use store::FileStore;
 pub use validation::{check_bindings, seal, validate, verify, CalibrationError};

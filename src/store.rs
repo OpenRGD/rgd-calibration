@@ -23,6 +23,16 @@ impl FileStore {
     /// Uses same-directory temporary file and no-clobber atomic persistence.
     pub fn save_new(&self, profile: &CalibrationProfile) -> Result<PathBuf, CalibrationError> {
         verify(profile)?;
+        if let Some(previous_id) = &profile.previous_profile_id {
+            // A revision chain is meaningful only when the predecessor exists
+            // locally, is intact, and identifies the same physical robot.
+            let previous = self.load(previous_id)?;
+            if previous.physical_instance_id != profile.physical_instance_id {
+                return Err(CalibrationError::BindingMismatch(
+                    "revision predecessor belongs to another physical instance".into(),
+                ));
+            }
+        }
         let destination = self.location(&profile.profile_id)?;
         let directory = destination.parent().ok_or_else(|| {
             CalibrationError::Invalid("profile store directory missing".into())

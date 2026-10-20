@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://openrgd.org/schemas/rgd-calibration/0.1.0/position-observation",
   "title": "OpenRGD Ephemeral Position Observation v0.1.0 candidate",
-  "description": "NOT a persisted calibration nor a motion authorization; reboot-scoped physical reference claim.",
+  "description": "Non-authoritative boot-scoped position claim. Time points are monotonic since boot; validate freshness before using external runtime gating.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -40,12 +40,24 @@
         "minLength": 1
       },
       "uniqueItems": true
+    },
+    "observed_at_monotonic_ns": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "required": [
     "joint_ref",
     "boot_id",
     "position_rad",
+    "observed_at_monotonic_ns",
     "reference_kind",
     "evidence_ids"
   ]

@@ -135,8 +135,14 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
         }
         check_evidence_refs(&measurement.evidence_ids, &evidence_ids, "measurement")?;
     }
+    let mut correction_parameter_refs = HashSet::new();
     for correction in &profile.corrections {
         require(&correction.parameter_ref, "correction.parameter_ref")?;
+        if !correction_parameter_refs.insert(correction.parameter_ref.as_str()) {
+            return Err(CalibrationError::Invalid(
+                "multiple corrections target the same parameter".into(),
+            ));
+        }
         require(&correction.unit, "correction.unit")?;
         if !correction.value.is_finite() {
             return Err(CalibrationError::Invalid("correction value must be finite".into()));
@@ -171,6 +177,17 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
         require(&record.approver, "validation.approver")?;
         check_time(&record.validated_at, "validation.validated_at")?;
         check_evidence_refs(&record.evidence_ids, &evidence_ids, "validation")?;
+        let validation_time = DateTime::parse_from_rfc3339(&record.validated_at)
+            .map_err(|_| CalibrationError::Invalid("invalid validation time".into()))?;
+        for evidence in &profile.evidence {
+            let observation_time = DateTime::parse_from_rfc3339(&evidence.recorded_at)
+                .map_err(|_| CalibrationError::Invalid("invalid evidence time".into()))?;
+            if observation_time > validation_time {
+                return Err(CalibrationError::Invalid(
+                    "evidence cannot postdate the last validation".into(),
+                ));
+            }
+        }
     }
 
     if profile.state == CalibrationState::Validated {

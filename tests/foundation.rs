@@ -2,7 +2,7 @@ use rgd_calibration::{
     check_bindings, seal, transition, verify, CalibrationMode, CalibrationProfile,
     CalibrationState, Correction, CorrectionOperation, Evidence, EvidenceOrigin, FileStore,
     HardwareIdentity, JointZeroReference, Measurement, MeasurementKind, PositionObservation,
-    PositionReferenceKind, ValidationRecord,
+    PositionReferenceKind, ValidationRecord, fork_for_recalibration,
 };
 
 fn hash() -> String {
@@ -127,15 +127,21 @@ fn current_pose_cannot_be_inferred_from_old_boot_or_relative_encoder() {
         joint_ref: "joint_a".into(),
         boot_id: "boot-1".into(),
         position_rad: Some(0.3),
+        observed_at_monotonic_ns: Some(1_000_000),
         reference_kind: PositionReferenceKind::AbsoluteEncoder,
         evidence_ids: vec!["sensor-frame-1".into()],
     };
-    assert!(observation.has_current_absolute_reference("boot-1"));
-    assert!(!observation.has_current_absolute_reference("boot-2"));
+    assert!(observation.has_fresh_absolute_reference_claim("boot-1", 1_005_000, 10_000));
+    assert!(!observation.has_fresh_absolute_reference_claim("boot-2", 1_005_000, 10_000));
+    assert!(!observation.has_fresh_absolute_reference_claim("boot-1", 1_100_000, 10_000));
+    assert!(!observation.has_fresh_absolute_reference_claim("boot-1", 999_999, 10_000));
+    observation.observed_at_monotonic_ns = None;
+    assert!(!observation.has_fresh_absolute_reference_claim("boot-1", 1_005_000, 10_000));
+    observation.observed_at_monotonic_ns = Some(1_000_000);
     observation.reference_kind = PositionReferenceKind::RelativeOnly;
-    assert!(!observation.has_current_absolute_reference("boot-1"));
+    assert!(!observation.has_fresh_absolute_reference_claim("boot-1", 1_005_000, 10_000));
     observation.reference_kind = PositionReferenceKind::Unknown;
-    assert!(!observation.has_current_absolute_reference("boot-1"));
+    assert!(!observation.has_fresh_absolute_reference_claim("boot-1", 1_005_000, 10_000));
 }
 
 #[test]
@@ -160,5 +166,62 @@ fn missing_measurement_provenance_is_invalid() {
 fn invalid_numeric_uncertainty_rejected() {
     let mut p = sample_validated();
     p.measurements[0].standard_uncertainty = f64::NAN;
+    assert!(seal(&mut p).is_err());
+}
+
+#[test]
+fn revision_fork_clears_old_evidence_and_preserves_immutable_parent() {
+    let temp = tempfile::tempdir().unwrap();
+    let store = FileStore::new(temp.path());
+    let mut parent = sample_validated();
+    seal(&mut parent).unwrap();
+    store.save_new(&parent).unwrap();
+    let mut child =
+        fork_for_recalibration(&parent, "cal_0002", "2026-10-19T19:05:00Z").unwrap();
+    assert_eq!(child.state, CalibrationState::CalibrationRequired);
+    assert_eq!(child.previous_profile_id.as_deref(), Some("cal_0001"));
+    assert_eq!(child.hardware, parent.hardware);
+    assert!(child.measurements.is_empty());
+    assert!(child.evidence.is_empty());
+    assert!(child.corrections.is_empty());
+    assert!(child.joint_zero_references.is_empty());
+    assert!(child.validation.is_none());
+    seal(&mut child).unwrap();
+    store.save_new(&child).unwrap();
+    assert_eq!(store.load("cal_0001").unwrap(), parent);
+    assert_eq!(store.load("cal_0002").unwrap(), child);
+}
+
+#[test]
+fn revision_rejects_reused_id_or_out_of_order_time() {
+    let mut p = sample_validated();
+    seal(&mut p).unwrap();
+    assert!(fork_for_recalibration(&p, "cal_0001", "2026-10-19T19:06:00Z").is_err());
+    assert!(fork_for_recalibration(&p, "cal_0002", "2026-10-19T18:00:00Z").is_err());
+}
+
+#[test]
+fn orphan_revision_is_not_persisted() {
+    let temp = tempfile::tempdir().unwrap();
+    let store = FileStore::new(temp.path());
+    let mut p = sample_validated();
+    seal(&mut p).unwrap();
+    let mut child =
+        fork_for_recalibration(&p, "cal_0002", "2026-10-19T19:06:00Z").unwrap();
+    seal(&mut child).unwrap();
+    assert!(store.save_new(&child).is_err());
+}
+
+#[test]
+fn invalid_duplicate_correction_is_rejected() {
+    let mut p = sample_validated();
+    p.corrections.push(p.corrections[0].clone());
+    assert!(seal(&mut p).is_err());
+}
+
+#[test]
+fn evidence_added_after_validation_invalidates_record() {
+    let mut p = sample_validated();
+    p.evidence[0].recorded_at = "2026-10-19T20:02:00Z".into();
     assert!(seal(&mut p).is_err());
 }

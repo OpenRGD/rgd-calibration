@@ -26,7 +26,8 @@ Rust 2021; runs offline after Cargo dependencies have been installed or vendored
 - `seal(&mut profile)` / `verify(&profile)` — self-excluding SHA-256 content integrity.
 - `check_bindings(...)` — reject a different physical instance, model hash, or registered device identity/firmware.
 - `FileStore::save_new(...)` / `load(...)` — immutable JSON revisions; refuse overwrites.
-- `PositionObservation::has_current_absolute_reference(boot_id)` — check **only** whether a reboot-scoped position claim contains the minimum evidence fields; it is not proof of sensor truth or motion authorization.
+- `PositionObservation::has_fresh_absolute_reference_claim(boot_id, now_ns, max_age_ns)` — check a **reboot-scoped and age-limited claim** using a monotonic clock; it does not authenticate sensors or authorize movement.
+- `fork_for_recalibration(&parent, new_id, timestamp)` — begin a fresh, linked revision without silently reusing previous measurements or validations.
 
 The persisted profile deliberately has **no current_position**: a position from a previous boot is not today's measured joint position. The safe rest pose is a separate reference, never the encoder zero by definition.
 

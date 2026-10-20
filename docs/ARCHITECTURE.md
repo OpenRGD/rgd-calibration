@@ -23,7 +23,7 @@ We represent the physical *delta* between theoretical model and measured body. T
 
 The intended procedural flow is **Discover → Inspect → Prepare → Measure → Estimate → Validate → Commit → Monitor**.
 
-The initial stored states are `uncalibrated` → `calibration_required` → `in_progress` → `validated`, with transitions to `degraded`, `expired` or `invalid`. A validated profile can be sent back to `calibration_required`. State transitions clear the previous integrity seal; the next edit must become a **new profile ID** linked through `previous_profile_id` and sealed before immutable storage. There is no mutation path in FileStore.
+The initial stored states are `uncalibrated` → `calibration_required` → `in_progress` → `validated`, with transitions to `degraded`, `expired` or `invalid`. A validated profile can be sent back to `calibration_required`. State transitions clear the previous integrity seal; the next edit must become a **new profile ID** linked through `previous_profile_id` and sealed before immutable storage. `fork_for_recalibration` creates a new `calibration_required` revision with new evidence/measurements/corrections empty; `FileStore::save_new` requires an intact, matching-instance predecessor when a link is provided. There is no mutation path in FileStore.
 
 In CAL-0.1, `active` mode is reserved and rejected. The library has no motor command interfaces, callbacks, or discovery side effects.
 
@@ -49,7 +49,7 @@ In CAL-0.1, `active` mode is reserved and rejected. The library has no motor com
 | Safe rest pose | Persisted definition | Not automatically safe to enter or hold |
 | Homing procedure | Optional external reference | Execution belongs to safety-gated runtime |
 
-`PositionObservation` is ephemeral and reboot-scoped. Its helper checks structural claims of absolute observability only; it cannot verify the hardware, establish metrological confidence, or authorize motion. If absolute position cannot be evidenced **in the current boot**, it remains unknown.
+`PositionObservation` is ephemeral and reboot-scoped. Its helper requires a same-boot monotonic timestamp, limits how old that reading may be, and checks structural claims of absolute observability only; it cannot verify the hardware, establish metrological confidence, or authorize motion. If an absolute position cannot be evidenced **recently in the current boot**, it remains unknown.
 
 ## API / storage
 
