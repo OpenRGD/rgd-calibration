@@ -227,7 +227,10 @@ fn register(
         );
     }
     let declared = raw.filter(|val| valid_shape(val, spec.length, spec.as_enum));
-    let saved = measurements.get(param_ref.as_str()).cloned().unwrap_or_default();
+    let saved = measurements
+        .get(param_ref.as_str())
+        .cloned()
+        .unwrap_or_default();
     let coverage = if !saved.is_empty() {
         CoverageKind::SavedEvidence
     } else if declared.is_some() {
@@ -398,15 +401,36 @@ fn build_preview(
             );
             continue;
         }
-        let supported = match (pieces[0], pieces[2], correction.operation, correction.unit.as_str()) {
-            ("kinematic_offsets_map", "zero_point_offset_rad_float",
-                CorrectionOperation::AdditiveDelta, "rad") => true,
-            ("kinematic_offsets_map", "backlash_hysteresis_rad_float",
-                CorrectionOperation::AbsoluteOverride, "rad") => correction.value >= 0.0,
-            ("dynamics_correction_map", "friction_scale_factor_float",
-                CorrectionOperation::MultiplicativeFactor, "1") => correction.value > 0.0,
-            ("dynamics_correction_map", "damping_scale_factor_float",
-                CorrectionOperation::MultiplicativeFactor, "1") => correction.value > 0.0,
+        let supported = match (
+            pieces[0],
+            pieces[2],
+            correction.operation,
+            correction.unit.as_str(),
+        ) {
+            (
+                "kinematic_offsets_map",
+                "zero_point_offset_rad_float",
+                CorrectionOperation::AdditiveDelta,
+                "rad",
+            ) => true,
+            (
+                "kinematic_offsets_map",
+                "backlash_hysteresis_rad_float",
+                CorrectionOperation::AbsoluteOverride,
+                "rad",
+            ) => correction.value >= 0.0,
+            (
+                "dynamics_correction_map",
+                "friction_scale_factor_float",
+                CorrectionOperation::MultiplicativeFactor,
+                "1",
+            ) => correction.value > 0.0,
+            (
+                "dynamics_correction_map",
+                "damping_scale_factor_float",
+                CorrectionOperation::MultiplicativeFactor,
+                "1",
+            ) => correction.value > 0.0,
             _ => false,
         };
         if !supported || !joint_ids.contains(pieces[1]) {
@@ -537,7 +561,10 @@ pub fn inspect_passive(
             );
             continue;
         }
-        for field in ["zero_point_offset_rad_float", "backlash_hysteresis_rad_float"] {
+        for field in [
+            "zero_point_offset_rad_float",
+            "backlash_hysteresis_rad_float",
+        ] {
             register(
                 &mut parameters,
                 &mut findings,
@@ -569,8 +596,16 @@ pub fn inspect_passive(
             continue;
         }
         for (field, nominal_key, unit) in [
-            ("mount_delta_xyz_m_vec3_float", "mount_pose_xyz_m_vec3_float", "m"),
-            ("mount_delta_rpy_rad_vec3_float", "mount_pose_rpy_rad_vec3_float", "rad"),
+            (
+                "mount_delta_xyz_m_vec3_float",
+                "mount_pose_xyz_m_vec3_float",
+                "m",
+            ),
+            (
+                "mount_delta_rpy_rad_vec3_float",
+                "mount_pose_rpy_rad_vec3_float",
+                "rad",
+            ),
         ] {
             if let Some(nominal) = entry.get(nominal_key) {
                 let reference = format!("sensors_mounting_map.{id}.{nominal_key}");
@@ -702,7 +737,10 @@ pub fn inspect_passive(
         &joint_ids,
     );
 
-    let known: BTreeSet<&str> = parameters.iter().map(|p| p.parameter_ref.as_str()).collect();
+    let known: BTreeSet<&str> = parameters
+        .iter()
+        .map(|p| p.parameter_ref.as_str())
+        .collect();
     for path in stored.keys() {
         if !known.contains(path) {
             finding(

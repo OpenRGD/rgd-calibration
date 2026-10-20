@@ -34,7 +34,10 @@ impl BundleSource {
     pub fn load(root: &Path) -> Result<Self, CalibrationError> {
         let candidates = [
             (root.join("spec/01_foundation"), "spec/01_foundation"),
-            (root.join("standard/01_foundation"), "standard/01_foundation"),
+            (
+                root.join("standard/01_foundation"),
+                "standard/01_foundation",
+            ),
             (root.join("01_foundation"), "01_foundation"),
             (root.to_path_buf(), "."),
         ];
@@ -94,7 +97,8 @@ fn load_one(
         )));
     }
     let relative = if directory_label == "." {
-        format!("{}",
+        format!(
+            "{}",
             path.file_name()
                 .and_then(|s| s.to_str())
                 .ok_or_else(|| CalibrationError::Invalid("non-UTF-8 source filename".into()))?
@@ -177,7 +181,9 @@ pub fn normalize_jsonc(input: &[u8]) -> Result<Vec<u8>, CalibrationError> {
         i += 1;
     }
     if in_string {
-        return Err(CalibrationError::Invalid("unterminated JSONC string".into()));
+        return Err(CalibrationError::Invalid(
+            "unterminated JSONC string".into(),
+        ));
     }
     // Separate pass so that comment whitespace is already removed.
     in_string = false;

@@ -44,7 +44,9 @@ fn run() -> Result<(), CalibrationError> {
     let mut out: Option<PathBuf> = None;
     let mut context = InspectionContext::default();
     while let Some(flag) = args.next() {
-        let value = args.next().ok_or_else(|| input_error("missing option value"))?;
+        let value = args
+            .next()
+            .ok_or_else(|| input_error("missing option value"))?;
         if value.starts_with("--") {
             return Err(input_error("option values must not begin with --"));
         }
@@ -55,11 +57,9 @@ fn run() -> Result<(), CalibrationError> {
                 context.physical_instance_id = Some(value)
             }
             "--model-hash" if context.model_sha256.is_none() => {
-                let valid = value
-                    .strip_prefix("sha256:")
-                    .is_some_and(|hex| {
-                        hex.len() == 64 && hex.bytes().all(|x| x.is_ascii_hexdigit())
-                    });
+                let valid = value.strip_prefix("sha256:").is_some_and(|hex| {
+                    hex.len() == 64 && hex.bytes().all(|x| x.is_ascii_hexdigit())
+                });
                 if !valid {
                     return Err(input_error("--model-hash requires sha256:<64 hex digits>"));
                 }
@@ -71,10 +71,7 @@ fn run() -> Result<(), CalibrationError> {
     }
     let root = bundle.ok_or_else(|| input_error(usage()))?;
     let bundle = BundleSource::load(&root)?;
-    let profile = profile_path
-        .as_deref()
-        .map(read_profile)
-        .transpose()?;
+    let profile = profile_path.as_deref().map(read_profile).transpose()?;
     let report = inspect_passive(&bundle, profile.as_ref(), &context)?;
     let mut json = serde_json::to_vec_pretty(&report)?;
     json.push(b'\n');

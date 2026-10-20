@@ -3,9 +3,7 @@ use rgd_calibration::model::{
     CalibrationMode, CalibrationProfile, CalibrationState, Correction, CorrectionOperation,
     Evidence, EvidenceOrigin, Measurement, MeasurementKind, ValidationRecord,
 };
-use rgd_calibration::passive::{
-    inspect_passive, BindingStatus, CoverageKind, InspectionContext,
-};
+use rgd_calibration::passive::{inspect_passive, BindingStatus, CoverageKind, InspectionContext};
 use rgd_calibration::source::{normalize_jsonc, BundleSource};
 use rgd_calibration::validation::seal;
 use serde_json::{json, Value};
@@ -58,7 +56,8 @@ fn sample_bundle() -> TempDir {
             "dynamics_correction_map": {"global_body": {"total_mass_delta_kg_float": 0.05}}
         }))
         .unwrap(),
-    ).unwrap();
+    )
+    .unwrap();
     fs::write(
         foundation.join("actuation_topology.json"),
         serde_json::to_vec(&json!({
@@ -67,7 +66,8 @@ fn sample_bundle() -> TempDir {
             }
         }))
         .unwrap(),
-    ).unwrap();
+    )
+    .unwrap();
     fs::write(
         foundation.join("hal_mapping.json"),
         serde_json::to_vec(&json!({
@@ -79,7 +79,8 @@ fn sample_bundle() -> TempDir {
             }
         }))
         .unwrap(),
-    ).unwrap();
+    )
+    .unwrap();
     fs::write(
         foundation.join("sensor_fidelity.json"),
         serde_json::to_vec(&json!({
@@ -88,7 +89,8 @@ fn sample_bundle() -> TempDir {
             }
         }))
         .unwrap(),
-    ).unwrap();
+    )
+    .unwrap();
     dir
 }
 
@@ -181,11 +183,10 @@ fn inventory_is_passive_and_declared_is_not_measured() {
     assert!(!report.current_robot_position_observed);
     assert!(!report.physical_drift_evaluated);
     assert!(report.export_preview.is_none());
-    assert!(report.parameters.iter().any(|p|
-        p.parameter_ref == "kinematic_offsets_map.right_knee.zero_point_offset_rad_float"
+    assert!(report.parameters.iter().any(|p| p.parameter_ref
+        == "kinematic_offsets_map.right_knee.zero_point_offset_rad_float"
         && p.coverage == CoverageKind::DeclaredOnly
-        && p.stored_measurements.is_empty()
-    ));
+        && p.stored_measurements.is_empty()));
 }
 
 #[test]
@@ -194,20 +195,17 @@ fn cross_domain_aliases_are_not_invented() {
     let bundle = read_bundle(dir.path());
     let report = inspect_passive(&bundle, None, &InspectionContext::default()).unwrap();
     assert!(report.findings.iter().any(|f| {
-        f.code == "unresolved_cross_domain_reference"
-            && f.reference.contains("knee_pitch_right")
+        f.code == "unresolved_cross_domain_reference" && f.reference.contains("knee_pitch_right")
     }));
     assert!(report.findings.iter().any(|f| {
-        f.code == "orphan_component_reference"
-            && f.reference.contains("right_knee_old")
+        f.code == "orphan_component_reference" && f.reference.contains("right_knee_old")
     }));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| { f.code == "orphan_component_reference" && f.reference.contains("missing_ft") }));
     assert!(report.findings.iter().any(|f| {
-        f.code == "orphan_component_reference"
-            && f.reference.contains("missing_ft")
-    }));
-    assert!(report.findings.iter().any(|f| {
-        f.code == "unresolved_cross_domain_reference"
-            && f.reference.contains("wifi_rf_monitor")
+        f.code == "unresolved_cross_domain_reference" && f.reference.contains("wifi_rf_monitor")
     }));
 }
 
@@ -215,14 +213,25 @@ fn cross_domain_aliases_are_not_invented() {
 fn missing_optional_files_do_not_generate_fake_values() {
     let dir = sample_bundle();
     let foundation = dir.path().join("spec/01_foundation");
-    for role in ["calibration", "actuation_topology", "hal_mapping", "sensor_fidelity"] {
+    for role in [
+        "calibration",
+        "actuation_topology",
+        "hal_mapping",
+        "sensor_fidelity",
+    ] {
         fs::remove_file(foundation.join(format!("{role}.json"))).unwrap();
     }
     let bundle = read_bundle(dir.path());
     let report = inspect_passive(&bundle, None, &InspectionContext::default()).unwrap();
     assert_eq!(report.coverage.declared_fields, 0);
-    assert!(report.findings.iter().any(|f| f.code == "optional_source_not_provided"));
-    assert!(report.source_digests.iter().all(|s| s.role == "description"));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| f.code == "optional_source_not_provided"));
+    assert!(report
+        .source_digests
+        .iter()
+        .all(|s| s.role == "description"));
 }
 
 #[test]
@@ -234,9 +243,11 @@ fn saved_claim_requires_explicit_identity_before_preview() {
     assert_eq!(report.profile_binding, BindingStatus::MissingContext);
     assert_eq!(report.coverage.saved_evidence_fields, 1);
     assert!(report.export_preview.is_none());
-    let row = report.parameters.iter().find(|x|
-        x.parameter_ref == "kinematic_offsets_map.right_knee.zero_point_offset_rad_float"
-    ).unwrap();
+    let row = report
+        .parameters
+        .iter()
+        .find(|x| x.parameter_ref == "kinematic_offsets_map.right_knee.zero_point_offset_rad_float")
+        .unwrap();
     assert_eq!(row.stored_measurements[0].value, 0.05);
 }
 
@@ -253,13 +264,14 @@ fn matched_claim_only_produces_unapplied_delta_preview() {
     assert_eq!(preview.status, "candidate_only_no_auto_commit");
     assert_eq!(preview.proposed_deltas.len(), 1);
     assert_eq!(
-        preview.canonical_calibration_delta_patch
-            ["kinematic_offsets_map"]["right_knee"]["zero_point_offset_rad_float"],
+        preview.canonical_calibration_delta_patch["kinematic_offsets_map"]["right_knee"]
+            ["zero_point_offset_rad_float"],
         json!(0.05)
     );
-    assert!(report.findings.iter().any(|f|
-        f.code == "candidate_differs_from_declaration_not_drift"
-    ));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| f.code == "candidate_differs_from_declaration_not_drift"));
 }
 
 #[test]
@@ -284,7 +296,10 @@ fn unrecognized_path_cannot_be_exported() {
     seal(&mut profile).unwrap();
     let report = inspect_passive(&bundle, Some(&profile), &matching_context()).unwrap();
     assert!(report.export_preview.is_none());
-    assert!(report.findings.iter().any(|f| f.code == "unsupported_preview_mapping"));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| f.code == "unsupported_preview_mapping"));
 }
 
 #[test]
@@ -318,7 +333,10 @@ fn invalid_vector_shape_is_not_silently_fixed() {
     let bundle = read_bundle(dir.path());
     let report = inspect_passive(&bundle, None, &InspectionContext::default()).unwrap();
     assert_eq!(report.coverage.declared_fields, 1);
-    assert!(report.findings.iter().any(|f| f.code == "invalid_declared_shape"));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| f.code == "invalid_declared_shape"));
 }
 
 #[test]
@@ -331,5 +349,8 @@ fn unvalidated_profile_cannot_preview() {
     seal(&mut profile).unwrap();
     let report = inspect_passive(&bundle, Some(&profile), &matching_context()).unwrap();
     assert!(report.export_preview.is_none());
-    assert!(report.findings.iter().any(|f| f.code == "profile_not_validated"));
+    assert!(report
+        .findings
+        .iter()
+        .any(|f| f.code == "profile_not_validated"));
 }
