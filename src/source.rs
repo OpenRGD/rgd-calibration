@@ -96,20 +96,14 @@ fn load_one(
             "{role} must be a JSON object"
         )));
     }
+    let filename = path
+        .file_name()
+        .and_then(|s| s.to_str())
+        .ok_or_else(|| CalibrationError::Invalid("non-UTF-8 source filename".into()))?;
     let relative = if directory_label == "." {
-        format!(
-            "{}",
-            path.file_name()
-                .and_then(|s| s.to_str())
-                .ok_or_else(|| CalibrationError::Invalid("non-UTF-8 source filename".into()))?
-        )
+        filename.to_owned()
     } else {
-        format!(
-            "{directory_label}/{}",
-            path.file_name()
-                .and_then(|s| s.to_str())
-                .ok_or_else(|| CalibrationError::Invalid("non-UTF-8 source filename".into()))?
-        )
+        format!("{directory_label}/{filename}")
     };
     Ok(Some(SourceDocument {
         role,

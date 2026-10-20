@@ -205,7 +205,6 @@ fn register(
     out: &mut Vec<CandidateField>,
     findings: &mut Vec<Finding>,
     bundle: &BundleSource,
-    kind: &str,
     id: &str,
     spec: FieldDefinition<'_>,
     nominal: Option<(&str, &Value)>,
@@ -240,7 +239,11 @@ fn register(
     };
     out.push(CandidateField {
         parameter_ref: param_ref,
-        component_kind: kind.to_owned(),
+        component_kind: if spec.section == "kinematic_offsets_map" {
+            "joint".to_owned()
+        } else {
+            "sensor".to_owned()
+        },
         component_id: id.to_owned(),
         unit: spec.unit.to_owned(),
         nominal_ref: nominal.map(|(name, _)| name.to_owned()),
@@ -569,7 +572,6 @@ pub fn inspect_passive(
                 &mut parameters,
                 &mut findings,
                 bundle,
-                "joint",
                 id,
                 FieldDefinition {
                     section: "kinematic_offsets_map",
@@ -613,7 +615,6 @@ pub fn inspect_passive(
                     &mut parameters,
                     &mut findings,
                     bundle,
-                    "sensor",
                     id,
                     FieldDefinition {
                         section: "sensor_extrinsics_delta_map",
@@ -640,7 +641,6 @@ pub fn inspect_passive(
                     &mut parameters,
                     &mut findings,
                     bundle,
-                    "sensor",
                     id,
                     FieldDefinition {
                         section: "sensor_intrinsics_map",
@@ -657,7 +657,6 @@ pub fn inspect_passive(
                 &mut parameters,
                 &mut findings,
                 bundle,
-                "sensor",
                 id,
                 FieldDefinition {
                     section: "sensor_intrinsics_map",
