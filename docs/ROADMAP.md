@@ -1,31 +1,29 @@
 # Calibration milestones
 
-## CAL-0.1 — Foundation (this PR)
+## CAL-0.1 — Foundation (merged via PR #1)
 
-- Core reconnaissance and contradiction log
-- Independent Rust profile / measurement / evidence / hardware-binding contracts
-- Explicit lifecycle and reject-active policy
-- JSON Schema 2020-12 candidate contracts
-- Self-excluding SHA-256 seal and immutable offline filesystem store
-- Fail-closed applicability to model/instance/devices
-- Reboot-scoped ephemeral position-reference contract
-- CI with offline unit tests and JSON syntax check
-- Proposal-only Module Registry manifest
+- Read-only hardware-agnostic Rust contracts, profile lifecycle, evidence references, immutable revisions
+- Integrity seals, schema, binding checks, 15 baseline tests, reproducible CI
+- Canonical Core audit; no Core changes, drivers or active movement
 
-**Acceptance:** source builds, all tests pass on GitHub CI, no motor/driver dependency, no modification to Canonical Core.
+## CAL-0.2 — Passive inspection (this PR)
 
-## CAL-0.2 — Passive calibration
+- Explicit local Canonical Core JSON/JSONC ingestion, source provenance
+- Joint/sensor calibration candidate inventory and missing-coverage report
+- Cross-domain reference checks without implicit aliasing
+- Separate nominal values / declared deltas / historical measurement claims
+- Validate model/instance claims before *unapplied* scalar canonical delta preview
+- JSON report schema + CLI and synthetic regression tests
+- No motor commands, no sensor polling, no physical drift/certification claims
 
-- Canonical Core model loader and field-reference resolver
-- Cross-domain reference normalization and coverage/missing-data reports
-- Read-only export preview to the existing calibration delta maps
-- Drift and incompatibility reporting without movement
+**Acceptance:** CI green, offline smoke CLI JSON, verified source inputs, zero changes to OpenRGD Canonical Core. All preview results must remain proposals.
 
 ## CAL-0.3 — Guided calibration
 
 - Human-guided procedures for joints, cameras, IMU and other sensors
 - Estimation/uncertainty, multi-measurement validation
 - Attested external evidence and revision approval/rollback
+- Vector-valued correction semantics and independently validated Canonical Core mapping
 
 ## CAL-0.4 — Safe active calibration
 
@@ -33,4 +31,4 @@ Only when an independently verified Somatic safety-gated execution protocol actu
 
 ## CAL-0.5+ — Continuous calibration
 
-Drift monitoring, sensor fusion, versioned revalidation decisions, autonomous suggestions requiring validated evidence and explicit approval.
+Drift monitoring **from comparable timestamped physical measurements**, sensor fusion, versioned revalidation decisions, autonomous suggestions requiring validated evidence and explicit approval.

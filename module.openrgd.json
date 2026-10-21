@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1.0-candidate",
   "module_id": "org.openrgd.calibration",
-  "module_version": "0.1.0",
+  "module_version": "0.2.0",
   "name": "OpenRGD Calibration",
   "runtime": "rust-library",
   "registry_status": "proposal-only",
@@ -11,7 +11,10 @@
     "calibration.profile.validate",
     "calibration.profile.seal",
     "calibration.profile.persist",
-    "calibration.bindings.inspect"
+    "calibration.bindings.inspect",
+    "calibration.passive.inspect",
+    "calibration.passive.coverage",
+    "calibration.passive.readonly_delta_preview"
   ],
   "active_calibration_supported": false,
   "canonical_contract_refs": [

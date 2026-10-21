@@ -1,0 +1,7 @@
+{
+  "meta_group": {"model_id_str": "synthetic_cli_fixture"},
+  "joint_topology_map": {"joint_one": {"type_enum": "REVOLUTE"}},
+  "sensors_mounting_map": {},
+  "actuators_topology_map": {},
+  "fixture_warning": "synthetic-only-not-a-real-robot"
+}
