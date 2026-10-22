@@ -1,34 +1,22 @@
-# Calibration milestones
+# OpenRGD Calibration — Roadmap
 
-## CAL-0.1 — Foundation (merged via PR #1)
+**Canonical planning checklist:** [Master Development Checklist](CALIBRATION_MASTER_CHECKLIST.md).  
+This file is a brief milestone index. The checklist contains acceptance gates, dependencies, negative tests and explicit status.
 
-- Read-only hardware-agnostic Rust contracts, profile lifecycle, evidence references, immutable revisions
-- Integrity seals, schema, binding checks, 15 baseline tests, reproducible CI
-- Canonical Core audit; no Core changes, drivers or active movement
+| Milestone | Focus | Current state |
+| --- | --- | --- |
+| CAL-0.1 | Rust foundation, immutable profiles, lifecycle, structural evidence | **Merged / CI verified** |
+| CAL-0.2 | Passive Core inspection, coverage, read-only proposal, CLI JSON | **Merged / CI verified** |
+| CAL-0.2.1 | Console v0.4 local acceptance, parser/canonical hash/registry contract hardening | **Next / not completed** |
+| CAL-0.3A | Offline guided session engine and typed metrology contracts | Planned |
+| CAL-0.3B | Guided joint/encoder/zero/reference procedures | Planned |
+| CAL-0.3C | Guided camera, IMU, force/contact and temporal alignment | Planned |
+| CAL-0.3D | Console guided wizard, review, approvals, immutable commit | Planned |
+| CAL-0.4 | Runtime-authorized safe active calibration only | Planned; blocked on safety gate |
+| CAL-0.5 | Physical drift monitoring and revalidation | Planned |
+| CAL-0.6+ | Evidence-driven self-calibration proposals and fleet workflows | Research/future |
+| CAL-1.0 | Production QA, provenance, documentation and release governance | Release target |
 
-## CAL-0.2 — Passive inspection (this PR)
+**Safety boundary:** module installation, RGD import, passive inspection or Console startup MUST NOT trigger motion. The Calibration crate is not a motor controller or safety authority.
 
-- Explicit local Canonical Core JSON/JSONC ingestion, source provenance
-- Joint/sensor calibration candidate inventory and missing-coverage report
-- Cross-domain reference checks without implicit aliasing
-- Separate nominal values / declared deltas / historical measurement claims
-- Validate model/instance claims before *unapplied* scalar canonical delta preview
-- JSON report schema + CLI and synthetic regression tests
-- No motor commands, no sensor polling, no physical drift/certification claims
-
-**Acceptance:** CI green, offline smoke CLI JSON, verified source inputs, zero changes to OpenRGD Canonical Core. All preview results must remain proposals.
-
-## CAL-0.3 — Guided calibration
-
-- Human-guided procedures for joints, cameras, IMU and other sensors
-- Estimation/uncertainty, multi-measurement validation
-- Attested external evidence and revision approval/rollback
-- Vector-valued correction semantics and independently validated Canonical Core mapping
-
-## CAL-0.4 — Safe active calibration
-
-Only when an independently verified Somatic safety-gated execution protocol actually exists: bounded authorized micro-movements, e-stop and comms-loss rules, independent observation, guard checks and negative tests.
-
-## CAL-0.5+ — Continuous calibration
-
-Drift monitoring **from comparable timestamped physical measurements**, sensor fusion, versioned revalidation decisions, autonomous suggestions requiring validated evidence and explicit approval.
+**Planning rule:** no physical calibration claim based solely on sample RGD values, hashes, synthetic data or green unit tests. See the [master checklist](CALIBRATION_MASTER_CHECKLIST.md) for verification criteria.
