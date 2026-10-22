@@ -4,6 +4,10 @@
 
 An independent, offline-first Rust module for calibration profile provenance, metrology records, and **read-only inspection** of an OpenRGD robot model. It never connects to actuators and never writes corrections into the Canonical Core. Calibration is not homing, and loading a description cannot move a robot.
 
+## Development roadmap
+
+The **[Calibration Master Development Checklist](docs/CALIBRATION_MASTER_CHECKLIST.md)** is the source of truth for completed milestones, next steps, quality gates and cross-repository dependencies. CAL-0.1/0.2 are merged and CI-verified; guided sessions, host-level Console acceptance, active calibration and continuous drift monitoring are not yet complete.
+
 ## Quick start
 
 ```bash
