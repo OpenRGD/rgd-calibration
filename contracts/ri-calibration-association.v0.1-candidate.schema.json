@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openrgd:calibration:ri-observation-association:v0.1-candidate",
+  "title": "CAL-RI-01 - read-only Reality Ingress observation association (candidate)",
+  "description": "An additive sidecar linking an existing RI v0.4 consumer reference to an independent CAL artifact. This is NOT a canonical Core contract, verified physical origin, depth authorization, or history/actuation grant. observation_ref must separately satisfy the RI contract pinned at rgd-reality-ingress@5372f758df79c93fc887f3858d878635447f4a4d.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observation_ref",
+    "calibration_ref",
+    "calibration_profile_state",
+    "association_status",
+    "reasons",
+    "assurance",
+    "depth_consumer"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "cal.ri-observation-association.v0.1-candidate"
+    },
+    "observation_ref": {
+      "type": "object",
+      "description": "Unmodified read-only RI candidate consumer ref validated independently against the upstream candidate schema; not a payload access grant."
+    },
+    "calibration_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CalibrationArtifactRef"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "calibration_profile_state": {
+      "anyOf": [
+        {
+          "enum": [
+            "uncalibrated",
+            "calibration_required",
+            "in_progress",
+            "validated",
+            "degraded",
+            "expired",
+            "invalid"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "association_status": {
+      "enum": [
+        "missing_calibration",
+        "candidate_metadata_match",
+        "incompatible_metadata"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "assurance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ri_reported_local_hash_verified",
+        "cal_profile_seal_verified",
+        "source_verified",
+        "hardware_identity_verified",
+        "robot_binding_verified",
+        "metrology_certified",
+        "history_committed",
+        "actuation_enabled"
+      ],
+      "properties": {
+        "ri_reported_local_hash_verified": {
+          "type": "boolean",
+          "description": "This reflects RI's local hash status claim; CAL does not repeat the hash verification."
+        },
+        "cal_profile_seal_verified": {
+          "type": "boolean",
+          "description": "Only CAL-0.1 record seal verification, not physical metrological acceptance."
+        },
+        "source_verified": {
+          "const": false
+        },
+        "hardware_identity_verified": {
+          "const": false
+        },
+        "robot_binding_verified": {
+          "const": false
+        },
+        "metrology_certified": {
+          "const": false
+        },
+        "history_committed": {
+          "const": false
+        },
+        "actuation_enabled": {
+          "const": false
+        }
+      }
+    },
+    "depth_consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calibration_revision",
+        "metric_depth_allowed",
+        "output_unit",
+        "ab_physical_order_status",
+        "camera_to_body_extrinsics_status",
+        "source_exposure_time_status",
+        "status"
+      ],
+      "properties": {
+        "calibration_revision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metric_depth_allowed": {
+          "const": false
+        },
+        "output_unit": {
+          "const": "unknown"
+        },
+        "ab_physical_order_status": {
+          "const": "unknown"
+        },
+        "camera_to_body_extrinsics_status": {
+          "const": "unknown"
+        },
+        "source_exposure_time_status": {
+          "const": "unknown"
+        },
+        "status": {
+          "const": "blocked_candidate"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "CalibrationArtifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kind",
+        "artifact_id",
+        "revision",
+        "artifact_sha256",
+        "contract_maturity",
+        "expected_source_id",
+        "expected_modality",
+        "expected_reference_frame_id",
+        "expected_payload_media_type",
+        "physical_instance_id",
+        "model_ref",
+        "model_sha256",
+        "hardware_uid_claim",
+        "video_transport_format_claim",
+        "resolution_sbs_claim_wh",
+        "frame_a_id_claim",
+        "frame_b_id_claim",
+        "checkerboard_square_mm_claim"
+      ],
+      "properties": {
+        "artifact_kind": {
+          "enum": [
+            "experimental_estimate",
+            "sealed_profile"
+          ]
+        },
+        "artifact_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_sha256": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "contract_maturity": {
+          "enum": [
+            "experimental",
+            "candidate"
+          ]
+        },
+        "expected_source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_modality": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_reference_frame_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_payload_media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "physical_instance_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hardware_uid_claim": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "video_transport_format_claim": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resolution_sbs_claim_wh": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame_a_id_claim": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame_b_id_claim": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checkerboard_square_mm_claim": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

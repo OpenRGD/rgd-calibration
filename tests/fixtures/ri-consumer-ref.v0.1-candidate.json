@@ -1,0 +1,25 @@
+{
+  "schema_version": "ri.consumer-observation-ref.v0.1-candidate",
+  "observation_id": "obs_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "source_id": "source.synthetic.occhi",
+  "modality": "rgb",
+  "reference_frame_id": "frame.synthetic.occhi_sbs",
+  "sample_sequence": 1,
+  "payload_sha256_hex": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "payload_media_type": "image/jpeg",
+  "payload_size_bytes": 512,
+  "origin_status": "unknown",
+  "integrity_status": "verified_local_hash",
+  "source_verified": false,
+  "robot_binding_verified": false,
+  "history_committed": false,
+  "actuation_enabled": false,
+  "time": {
+    "clock_domain_id": "chronos.monotonic.synthetic",
+    "boot_id": "boot_synthetic_01",
+    "received_monotonic_ns": 100000,
+    "source_time_status": "unknown",
+    "source_measurement_time": null,
+    "chronograf_anchor_ref": null
+  }
+}

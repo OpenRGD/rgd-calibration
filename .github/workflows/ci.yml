@@ -61,3 +61,5 @@ jobs:
           python3 -m json.tool contracts/position-observation.v0.1.schema.json > /dev/null
           python3 -m json.tool module.openrgd.json > /dev/null
           python3 -m json.tool contracts/passive-report.v0.2.schema.json > /dev/null
+          python3 -m json.tool contracts/ri-calibration-association.v0.1-candidate.schema.json > /dev/null
+          python3 -m json.tool tests/fixtures/ri-consumer-ref.v0.1-candidate.json > /dev/null
