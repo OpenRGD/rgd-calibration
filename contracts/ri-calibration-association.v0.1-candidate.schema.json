@@ -13,7 +13,8 @@
     "association_status",
     "reasons",
     "assurance",
-    "depth_consumer"
+    "depth_consumer",
+    "artifact_resolution_status"
   ],
   "properties": {
     "schema_version": {
@@ -168,6 +169,14 @@
           "type": "null"
         }
       }
+    },
+    "artifact_resolution_status": {
+      "enum": [
+        "missing",
+        "unverified_claim",
+        "cal_profile_seal_only"
+      ],
+      "description": "Claims without an independently resolved estimate; sealed CAL profile only proves JSON integrity, never metrological authority."
     }
   },
   "$defs": {

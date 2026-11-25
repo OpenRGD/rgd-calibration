@@ -1,11 +1,11 @@
 # HANDOFF DI RITORNO — CAL → Reality Ingress / RI-INTEGRATION-01
 
-**25 novembre 2026 · candidato · non normativo · non attuante.**  
+**25 novembre 2026 · candidato · non normativo · non attuante.** Adapter CAL in `main` solo se accettato, con feature Rust `ri-candidate` **disattiva per default** e senza attivazione in Console/Registry. PR CAL #3/#4 già integrate, #4 soltanto come esperimento.  
 Riferimenti: [RI PR #4](https://github.com/OpenRGD/rgd-reality-ingress/pull/4), [CAL PR #3](https://github.com/OpenRGD/rgd-calibration/pull/3), [CAL PR #4 OCCHI](https://github.com/OpenRGD/rgd-calibration/pull/4).
 
 ## Decisioni CAL
 
-- CAL-0.2 su `main` e CAL-0.3 OCCHI su PR sperimentale **restano distinte**. Niente promozione a `validated`/`accepted` solo perché esistono uno studio OpenCV o un hash.
+- CAL-0.2 su `main` e CAL-0.3 OCCHI **sperimentale e isolato** ora su `main` restano contratti distinti; la PR OCCHI #4 è stata integrata esclusivamente come tool opzionale. Niente promozione a `validated`/`accepted` solo perché esistono uno studio OpenCV o un hash.
 - Nuovo adapter **read-only** in repo CAL: `associate_ri_observation(ri_ref, optional_cal_artifact_ref, optional_sealed_cal_profile)`; produce un **sidecar candidato** `cal.ri-observation-association.v0.1-candidate`, non modifica RI v0.4.
 - L'`observation_id` e il `payload_sha256_hex` originali rimangono identici. `verified_local_hash` è soltanto integrità verificata dal **RI store**, non una prova di origine/sensore/metrologia. Ogni altro potere resta falso.
 - Profilo CAL identificato separatamente da `artifact_id/revision/artifact_sha256`; per un CAL-0.1 sealed profile, `revision == profile_id` e si verifica il sigillo; per OCCHI sperimentale, `kind=experimental_estimate`, maturità `experimental` e **nessuno stato CAL validato**.

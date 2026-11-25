@@ -1,3 +1,5 @@
+#![cfg(feature = "ri-candidate")]
+
 use rgd_calibration::model::{CalibrationProfile, CalibrationState};
 use rgd_calibration::ri_association::{
     associate_ri_observation, ArtifactKind, CalibrationArtifactRef, ContractMaturity,
@@ -79,6 +81,7 @@ fn experimental_reference_is_sidecar_and_never_updates_ri_ref() {
     assert_eq!(result["calibration_ref"]["revision"], "estimate_01");
     assert_eq!(result["calibration_profile_state"], Value::Null);
     assert_eq!(result["association_status"], "candidate_metadata_match");
+    assert_eq!(result["artifact_resolution_status"], "unverified_claim");
     assert_eq!(result["assurance"]["ri_reported_local_hash_verified"], true);
     assert_eq!(result["assurance"]["cal_profile_seal_verified"], false);
     assert_eq!(result["assurance"]["source_verified"], false);
@@ -94,6 +97,7 @@ fn experimental_reference_is_sidecar_and_never_updates_ri_ref() {
 fn missing_calibration_is_explicit_and_never_depth_usable() {
     let result = associate_ri_observation(&reference(), None, None).unwrap();
     assert_eq!(result["association_status"], "missing_calibration");
+    assert_eq!(result["artifact_resolution_status"], "missing");
     assert_eq!(result["calibration_ref"], Value::Null);
     assert_eq!(result["depth_consumer"]["metric_depth_allowed"], false);
 }
@@ -262,6 +266,7 @@ fn authentic_sealed_profile_is_not_a_physical_calibration_certificate() {
     let out = associate_ri_observation(&reference(), Some(&target), Some(&p)).unwrap();
     assert_eq!(out["assurance"]["cal_profile_seal_verified"], true);
     assert_eq!(out["calibration_profile_state"], "uncalibrated");
+    assert_eq!(out["artifact_resolution_status"], "cal_profile_seal_only");
     assert!(out["reasons"]
         .as_array()
         .unwrap()

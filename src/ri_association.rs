@@ -391,6 +391,11 @@ pub fn associate_ri_observation(
         "calibration_ref": calibration_ref,
         "calibration_profile_state": state,
         "association_status": association_status,
+        "artifact_resolution_status": match candidate.map(|c| c.artifact_kind) {
+            None => "missing",
+            Some(ArtifactKind::ExperimentalEstimate) => "unverified_claim",
+            Some(ArtifactKind::SealedProfile) => "cal_profile_seal_only",
+        },
         "reasons": reasons,
         "assurance": {
             "ri_reported_local_hash_verified": ri.get("integrity_status").and_then(Value::as_str) == Some("verified_local_hash"),
