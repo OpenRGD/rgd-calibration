@@ -1,6 +1,6 @@
 # OpenRGD Calibration — Master Development Checklist
 
-**Status reviewed:** 2026-10-22  
+**Status reviewed:** 2026-11-25  
 **Scope:** `OpenRGD/rgd-calibration` (Rust, offline-first, hardware-agnostic) and its versioned contracts with Canonical Core, Module Registry, Console, Chronograf/Chronon and Somatic Runtime.  
 **Rule:** `[x]` means verified in the existing source/CI **for that scope only**; `[ ]` means not yet proven or implemented. Passing synthetic tests never constitutes a physical robot calibration.
 
@@ -64,6 +64,37 @@ Canonical RGD description (immutable theory)
 - [x] 31 tests, Rustfmt/Clippy, synthetic and pinned-reference CLI smoke green; PR #2 merged.
 - [x] Module Registry v0.1 lists `org.openrgd.calibration@0.2.0` pinned to merged source commit, with actual GitHub CI install/build smoke.
 - [ ] Console v0.4 deployment on the user's Ubuntu/Fedora hosts: source integration exists, **Docker/UI hardware-host acceptance not yet verified**.
+
+---
+
+## PR consolidation / RI-INTEGRATION-01 — review snapshot, 2026-11-25
+
+**Change management:** these are separate work streams, not one combined release. Do not mistake a green CI check, an experimental camera estimate or a candidate schema for independently certified physical evidence.
+
+**Documentation branch:** [CAL PR #3](https://github.com/OpenRGD/rgd-calibration/pull/3) consolidates this checklist. No runtime or physical authority is added.
+
+### CAL #4 — OCCHI stereo experiment (PR open; NOT released in module registry)
+
+- [x] Optional OpenCV experiment is isolated under `tools/occhi_stereo` in [PR #4](https://github.com/OpenRGD/rgd-calibration/pull/4); it does not modify CAL-0.2 Rust profile contracts, perform motor commands or write Canonical Core files. Synthetic CI passed.
+- [ ] Document the upstream **single camera acquisition owner** and explicit exclusivity/lease gate before any new real capture; `cv2.VideoCapture` in the experimental tool MUST NOT become a parallel reader in the RI/PERIPH pipeline.
+- [ ] Make the experiment accept externally provided captured image pairs (from the sole approved owner) without opening video devices; pin origin, acquisition metadata and frame sequence.
+- [ ] Reconcile source session capture board geometry: 35-pair/20 mm reported in RI handoff versus example 25 mm board in CAL #4. A session's declared square dimension is not independent proof that it was measured correctly.
+- [ ] Preserve A/B stream order separately from **verified physical left/right placement**, calibration resolution and motion-sensitive camera→neck→torso extrinsics.
+- [ ] Verify RMS, baseline, reprojection error and uncertainty with held-out physical observations; **no automatic metric-depth certification** from fitting success.
+- [ ] Store image captures outside Git with controlled access/retention; distinguish generated synthetic pairs from physical samples.
+- [ ] Merge only as **disabled-by-default experimental tooling** once the owner/isolation and data immutability review is satisfied; do not publish an installable/validated CAL-0.3 module by merging the tool.
+
+### CAL #5 — RI consumer-ref association (Draft, candidate-only)
+
+- [x] [CAL PR #5](https://github.com/OpenRGD/rgd-calibration/pull/5) adds an isolated read-only candidate adapter, sidecar, schema, return handoff and **15 synthetic compatibility tests**; existing Rust suite remains passing (46 total).
+- [x] CAL → RI return handoff has been delivered to [RI PR #4](https://github.com/OpenRGD/rgd-reality-ingress/pull/4). This conveys decisions, NOT acceptance of RI's candidate contract.
+- [ ] Review the exact upstream RI candidate consumer-ref version/shape and policy for read ACL, retention, expiry and local-store digest verification. The RI consumer reference alone must never grant media access.
+- [ ] Ensure the `experimental_estimate` reference is treated as a **claim** until an independent artifact resolver verifies ID/revision/content digest (the CAL v0.1 sealed profile path already verifies its own seal). Never mark a claimed estimate as validated.
+- [ ] Exercise negative tests for missing/stale/incompatible profile, source/frame/media, invalid hash, untrusted physical identity, unqualified time and fake history/motion authority.
+- [ ] Make all quantitative depth consumers require separate Perception approval, physical A/B orientation, intrinsics, stereo extrinsics, metric scale/uncertainty and optional body transforms. **Default: depth unit unknown and metric output disabled.**
+- [ ] Coordinate review with RI PR #4, still a draft/non-normative producer contract; no automatic merge/promotion of CAL #5 or new Core schema.
+
+**Consolidation gate:** first merge documentation after CI; keep experimental and candidate PRs independent. The code PRs may be merged as *experimental/candidate only* after their safety/ownership compatibility review, with no auto-deploy, Core model changes, module-registry version bump, live camera opening, or any motor privilege. The word `validated` in CAL v0.1 is a structural lifecycle status, **not metrological certification**.
 
 ---
 
