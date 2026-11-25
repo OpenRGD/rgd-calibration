@@ -324,7 +324,7 @@ pub fn associate_ri_observation(
         .flatten();
 
     let mut reasons = Vec::<String>::new();
-    let (association_status, calibration_ref) = if let Some(target) = candidate {
+    let (mut association_status, calibration_ref) = if let Some(target) = candidate {
         let mut matches = true;
         for (field, expected, code) in [
             (
@@ -370,6 +370,9 @@ pub fn associate_ri_observation(
     }
     if state.is_some_and(|status| status != CalibrationState::Validated) {
         reasons.push("calibration_profile_not_validated".into());
+        if association_status == "candidate_metadata_match" {
+            association_status = "calibration_inapplicable";
+        }
     }
     if state.is_none() {
         reasons.push("independent_cal_profile_missing".into());
@@ -403,9 +406,13 @@ pub fn associate_ri_observation(
             "calibration_revision": candidate.map(|x| x.revision.clone()),
             "metric_depth_allowed": false,
             "output_unit": "unknown",
+            "stereo_intrinsics_status": "unknown",
+            "stereo_relative_extrinsics_status": "unknown",
             "ab_physical_order_status": "unknown",
             "camera_to_body_extrinsics_status": "unknown",
             "source_exposure_time_status": "unknown",
+            "uncertainty_status": "unknown",
+            "metric_depth_standard_uncertainty_m": null,
             "status": "blocked_candidate",
         },
     }))

@@ -55,7 +55,8 @@
       "enum": [
         "missing_calibration",
         "candidate_metadata_match",
-        "incompatible_metadata"
+        "incompatible_metadata",
+        "calibration_inapplicable"
       ]
     },
     "reasons": {
@@ -118,7 +119,11 @@
         "ab_physical_order_status",
         "camera_to_body_extrinsics_status",
         "source_exposure_time_status",
-        "status"
+        "status",
+        "stereo_intrinsics_status",
+        "stereo_relative_extrinsics_status",
+        "uncertainty_status",
+        "metric_depth_standard_uncertainty_m"
       ],
       "properties": {
         "calibration_revision": {
@@ -149,6 +154,18 @@
         },
         "status": {
           "const": "blocked_candidate"
+        },
+        "stereo_intrinsics_status": {
+          "const": "unknown"
+        },
+        "stereo_relative_extrinsics_status": {
+          "const": "unknown"
+        },
+        "uncertainty_status": {
+          "const": "unknown"
+        },
+        "metric_depth_standard_uncertainty_m": {
+          "type": "null"
         }
       }
     }

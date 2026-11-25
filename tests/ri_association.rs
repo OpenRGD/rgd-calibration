@@ -279,6 +279,7 @@ fn expired_sealed_profile_is_linkable_only_as_blocked_historical_context() {
     let target = from_sealed(&p);
     let out = associate_ri_observation(&reference(), Some(&target), Some(&p)).unwrap();
     assert_eq!(out["calibration_profile_state"], "expired");
+    assert_eq!(out["association_status"], "calibration_inapplicable");
     assert_eq!(out["depth_consumer"]["metric_depth_allowed"], false);
 }
 
@@ -307,5 +308,10 @@ fn sidecar_json_roundtrip_preserves_ri_ids_hash_and_unknown_physical_truth() {
     assert_eq!(
         decoded["depth_consumer"]["camera_to_body_extrinsics_status"],
         "unknown"
+    );
+    assert_eq!(decoded["depth_consumer"]["uncertainty_status"], "unknown");
+    assert_eq!(
+        decoded["depth_consumer"]["metric_depth_standard_uncertainty_m"],
+        Value::Null
     );
 }
