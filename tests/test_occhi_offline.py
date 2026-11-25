@@ -1,6 +1,10 @@
 """Offline tests for non-actuating OCCHI helper; does not need camera or printer."""
 import importlib.util
+import json
 from pathlib import Path
+import tempfile
+from types import SimpleNamespace
+from unittest import mock
 import unittest
 
 import cv2
@@ -33,6 +37,38 @@ class TestOcchiOffline(unittest.TestCase):
         self.assertEqual(points.shape, (54, 3))
         self.assertAlmostEqual(float(points[-1, 0]), .2)
         self.assertAlmostEqual(float(points[-1, 1]), .125)
+
+    def test_capture_needs_exclusive_owner_ack_before_opening_device(self):
+        args = SimpleNamespace(
+            session="/tmp/occhi-synthetic-test-would-not-write",
+            device="/dev/nonexistent",
+            rotate_each=180,
+            square_mm=20.0,
+            confirmed_square_mm=False,
+            confirm_exclusive_camera_owner=False,
+        )
+        with mock.patch.object(OCCHI.cv2, "VideoCapture") as opener:
+            with self.assertRaisesRegex(RuntimeError, "Exclusive camera-owner"):
+                OCCHI.capture(args)
+            opener.assert_not_called()
+
+    def test_calibration_rejects_20_to_25_mm_scale_conflict(self):
+        with tempfile.TemporaryDirectory() as temp:
+            session = Path(temp) / "session"
+            session.mkdir()
+            (session / "session.json").write_text(json.dumps({
+                "schema": "openrgd.experimental.stereo_capture.v0.1",
+                "capture_resolution": [2560, 720],
+                "checkerboard_square_size_mm_declared": 20.0,
+                "pairs": [],
+            }), encoding="utf-8")
+            args = SimpleNamespace(
+                session=str(session), out=str(Path(temp) / "estimate"),
+                square_mm=25.0, confirmed_square_mm=False, min_pairs=18,
+            )
+            with self.assertRaisesRegex(RuntimeError, "incompatible"):
+                OCCHI.calibrate(args)
+            self.assertFalse((Path(temp) / "estimate").exists())
 
     def test_detect_generated_checkerboard(self):
         board = np.full((720, 1280, 3), 255, np.uint8)

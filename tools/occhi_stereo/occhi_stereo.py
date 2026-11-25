@@ -77,16 +77,17 @@ def _view_for_preview(a, b, corners_a, corners_b, pair_count):
 
 
 def capture(args):
+    # Explicit human acknowledgment is not a physical lease: never compete
+    # with the shared RI/Peripheral camera owner for this device.
+    if not getattr(args, "confirm_exclusive_camera_owner", False):
+        raise RuntimeError(
+            "Exclusive camera-owner acknowledgment required: do not open a second reader."
+        )
+    if not math.isfinite(args.square_mm) or args.square_mm <= 0:
+        raise ValueError("square-mm must be a finite, declared board dimension")
     session = Path(args.session).expanduser()
     session.mkdir(parents=True, exist_ok=True)
     device = args.device
-    cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
-    if not cap.isOpened():
-        raise RuntimeError(f"Unable to open camera {device}. Close ffplay or other clients.")
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    cap.set(cv2.CAP_PROP_FPS, 30)
     meta_file = session / "session.json"
     saved = len(list(session.glob("pair_*_A.png")))
     # Do not claim that user-space monotonic time is hardware exposure time.
@@ -97,6 +98,8 @@ def capture(args):
         "requested_fps": 30,
         "inner_corners": list(PATTERN),
         "rotate_each_degrees": args.rotate_each,
+        "checkerboard_square_size_mm_declared": args.square_mm,
+        "operator_claims_board_measured": bool(args.confirmed_square_mm),
         "sensor_order_verified": False,
         "timestamps": "host_monotonic_receipt_only_not_chronograf",
         "pairs": [],
@@ -106,7 +109,19 @@ def capture(args):
         metadata = json.loads(meta_file.read_text(encoding="utf-8"))
         if metadata.get("rotate_each_degrees") != args.rotate_each:
             raise RuntimeError("Existing session uses another rotation; choose a new session")
+        if metadata.get("checkerboard_square_size_mm_declared") != args.square_mm:
+            raise RuntimeError("Existing session board scale is missing/mismatched; use a new session")
+        if metadata.get("capture_resolution") != [2560, 720]:
+            raise RuntimeError("Existing session geometry is invalid; use a new session")
         saved = len(metadata.get("pairs", []))
+    # Never open the camera before checking session compatibility.
+    cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
+    if not cap.isOpened():
+        raise RuntimeError(f"Unable to open camera {device}. Close ffplay or other clients.")
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    cap.set(cv2.CAP_PROP_FPS, 30)
     try:
         while True:
             ok, raw = cap.read()
@@ -171,10 +186,18 @@ def _load_pairs(session: Path):
 def calibrate(args):
     session = Path(args.session).expanduser()
     out = Path(args.out).expanduser()
-    if (out / "occhi_stereo_experimental.json").exists() and not args.overwrite:
-        raise RuntimeError("Output calibration exists; use a new folder (or --overwrite)")
+    if (out / "occhi_stereo_experimental.json").exists():
+        raise RuntimeError("An estimate already exists; keep it and use a new output folder")
     if args.square_mm <= 0 or not math.isfinite(args.square_mm):
         raise ValueError("square-mm must be finite and >0")
+    metadata_path = session / "session.json"
+    if not metadata_path.is_file():
+        raise RuntimeError("Capture session metadata missing")
+    session_meta = json.loads(metadata_path.read_text(encoding="utf-8"))
+    if session_meta.get("checkerboard_square_size_mm_declared") != args.square_mm:
+        raise RuntimeError("Captured session board size is unknown or incompatible")
+    if session_meta.get("capture_resolution") != [2560, 720]:
+        raise RuntimeError("Captured frame resolution is unknown or incompatible")
     obj, image_a, image_b, used = [], [], [], []
     sample = None
     for name, a, b in _load_pairs(session):
@@ -222,7 +245,9 @@ def calibrate(args):
         "sensor_A_B_stream_order_only": True,
         "input": {"resolution_sbs": [2560, 720], "per_eye": list(size),
                   "square_size_mm_declared": args.square_mm,
-                  "square_size_physically_verified": bool(args.confirmed_square_mm),
+                  "capture_board_size_operator_claim": bool(session_meta.get("operator_claims_board_measured")),
+                  "calibration_board_size_operator_claim": bool(args.confirmed_square_mm),
+                  "square_size_physically_verified": False,
                   "sessions": str(session), "pairs_used": used},
         "metrics": {"valid_pairs": len(used), "rms_A_px": float(rms_a),
                     "rms_B_px": float(rms_b), "rms_stereo_px": float(rms_stereo),
@@ -299,15 +324,20 @@ def main(argv=None):
     c.add_argument("--device", default=DEFAULT_DEVICE)
     c.add_argument("--session", default="~/occhi-calibration/session01")
     c.add_argument("--rotate-each", type=int, choices=(0, 180), default=180)
+    c.add_argument("--square-mm", type=float, required=True,
+                   help="Explicit board size in mm; never infer 20 vs 25")
+    c.add_argument("--confirmed-square-mm", action="store_true",
+                   help="Operator claims measured square size; not certification")
+    c.add_argument("--confirm-exclusive-camera-owner", action="store_true",
+                   help="Operator confirms the single acquisition owner released the device")
     c.set_defaults(func=capture)
     cal = sub.add_parser("calibrate", help="Offline estimate intrinsics, stereo extrinsics, and rectification")
     cal.add_argument("--session", default="~/occhi-calibration/session01")
     cal.add_argument("--out", default="~/occhi-calibration/estimate01")
-    cal.add_argument("--square-mm", type=float, default=25.0)
+    cal.add_argument("--square-mm", type=float, required=True)
     cal.add_argument("--confirmed-square-mm", action="store_true",
                      help="Only set after independently measuring printed square edge with a ruler")
     cal.add_argument("--min-pairs", type=int, default=18)
-    cal.add_argument("--overwrite", action="store_true")
     cal.set_defaults(func=calibrate)
     r = sub.add_parser("rectify", help="Rectify one captured raw SBS image after calibration")
     r.add_argument("--calibration", required=True)

@@ -9,13 +9,14 @@ from reportlab.pdfgen import canvas
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', default='board-A4-25mm.pdf')
+    parser.add_argument('--square-mm', type=float, choices=(20.0, 25.0), default=25.0)
     args = parser.parse_args()
     width, height = landscape(A4)
-    square = 25 * mm
+    square = args.square_mm * mm
     cols, rows = 10, 7
     x0, y0 = (width-cols*square)/2, (height-rows*square)/2
     c = canvas.Canvas(args.out, pagesize=(width, height), pageCompression=0)
-    c.setTitle('OCCHI - A4 stereo calibration board 10x7 squares, 25mm')
+    c.setTitle(f'OCCHI - A4 stereo calibration board 10x7 squares, {args.square_mm}mm')
     for row in range(rows):
         for col in range(cols):
             c.setFillColorRGB(0, 0, 0) if (col + row) % 2 == 0 else c.setFillColorRGB(1, 1, 1)
