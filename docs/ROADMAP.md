@@ -8,8 +8,8 @@ This file is a brief milestone index. The checklist contains acceptance gates, d
 | CAL-0.1 | Rust foundation, immutable profiles, lifecycle, structural evidence | **Merged / CI verified** |
 | CAL-0.2 | Passive Core inspection, coverage, read-only proposal, CLI JSON | **Merged / CI verified** |
 | CAL-0.2.1 | Console v0.4 local acceptance, parser/canonical hash/registry contract hardening | **Next / not completed** |
-| CAL-RI-01 | RI consumer-reference sidecar (CAL PR #5, RI PR #4 upstream) | Draft/candidate: not in main, no authority |
-| CAL-0.3 OCCHI | Optional experimental stereo/OpenCV tooling (CAL PR #4) | CI green, NOT physically validated or installed |
+| CAL-RI-01 | RI consumer-reference sidecar (CAL PR #5, RI PR #4 upstream) | **Merged as opt-in Rust feature**; upstream RI Draft; no runtime authority |
+| CAL-0.3 OCCHI | Optional experimental stereo/OpenCV tooling (CAL PR #4) | **Merged as isolated experiment**; no physical verification or module release |
 | CAL-0.3A | Offline guided session engine and typed metrology contracts | Planned |
 | CAL-0.3B | Guided joint/encoder/zero/reference procedures | Planned |
 | CAL-0.3C | Guided camera, IMU, force/contact and temporal alignment | Planned |
