@@ -8,6 +8,8 @@ pub mod lifecycle;
 pub mod model;
 pub mod passive;
 pub mod revision;
+#[cfg(feature = "ri-candidate")]
+pub mod ri_association;
 pub mod source;
 pub mod store;
 pub mod validation;
