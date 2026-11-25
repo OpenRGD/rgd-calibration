@@ -4,6 +4,14 @@
 
 An independent, offline-first Rust module for calibration profile provenance, metrology records, and **read-only inspection** of an OpenRGD robot model. It never connects to actuators and never writes corrections into the Canonical Core. Calibration is not homing, and loading a description cannot move a robot.
 
+## Experimental and RI integration boundaries
+
+The [OCCHI stereo experiment (PR #4)](https://github.com/OpenRGD/rgd-calibration/pull/4) and [Reality Ingress candidate adapter (PR #5)](https://github.com/OpenRGD/rgd-calibration/pull/5) remain separate from CAL-0.2 release. Stereo fitting is not physical calibration acceptance; RI provenance/observation references do not authenticate a sensor or grant media access, depth-in-meters or motion. See the [consolidation checklist](docs/CALIBRATION_MASTER_CHECKLIST.md#pr-consolidation--ri-integration-01--review-snapshot-2026-11-25).
+
+## Development roadmap
+
+The **[Calibration Master Development Checklist](docs/CALIBRATION_MASTER_CHECKLIST.md)** is the source of truth for completed milestones, next steps, quality gates and cross-repository dependencies. CAL-0.1/0.2 are merged and CI-verified; guided sessions, host-level Console acceptance, active calibration and continuous drift monitoring are not yet complete.
+
 ## Quick start
 
 ```bash
