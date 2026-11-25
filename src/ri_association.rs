@@ -65,7 +65,8 @@ fn bad(message: &str) -> CalibrationError {
 
 fn is_hex64(s: &str) -> bool {
     s.len() == 64
-        && s.bytes().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
+        && s.bytes()
+            .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
 }
 
 fn require_str<'a>(
@@ -114,32 +115,46 @@ fn validate_ri_ref(input: &Value) -> Result<(), CalibrationError> {
         return Err(bad("unsupported RI candidate contract"));
     }
     let id = require_str(input, "observation_id", 36)?;
-    if !id
-        .strip_prefix("obs_")
-        .is_some_and(|part| part.len() == 32 && part.bytes().all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase()))
-    {
+    if !id.strip_prefix("obs_").is_some_and(|part| {
+        part.len() == 32
+            && part
+                .bytes()
+                .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+    }) {
         return Err(bad("invalid RI observation_id"));
     }
     require_str(input, "source_id", 256)?;
     require_str(input, "modality", 128)?;
     require_str(input, "reference_frame_id", 256)?;
     require_str(input, "payload_media_type", 128)?;
-    if input.get("sample_sequence").and_then(Value::as_u64).is_none()
-        || input.get("payload_size_bytes").and_then(Value::as_u64).is_none()
+    if input
+        .get("sample_sequence")
+        .and_then(Value::as_u64)
+        .is_none()
+        || input
+            .get("payload_size_bytes")
+            .and_then(Value::as_u64)
+            .is_none()
     {
         return Err(bad("invalid RI sample sequence or payload size"));
     }
     if !is_hex64(require_str(input, "payload_sha256_hex", 64)?) {
         return Err(bad("invalid RI payload digest"));
     }
-    if !["unknown", "source_claimed_physical", "source_declared_simulated"]
-        .contains(&require_str(input, "origin_status", 64)?)
+    if ![
+        "unknown",
+        "source_claimed_physical",
+        "source_declared_simulated",
+    ]
+    .contains(&require_str(input, "origin_status", 64)?)
     {
         return Err(bad("invalid RI origin status"));
     }
-    if !["not_verified", "verified_local_hash"]
-        .contains(&require_str(input, "integrity_status", 64)?)
-    {
+    if !["not_verified", "verified_local_hash"].contains(&require_str(
+        input,
+        "integrity_status",
+        64,
+    )?) {
         return Err(bad("invalid RI integrity status"));
     }
     for flag in [
@@ -149,7 +164,9 @@ fn validate_ri_ref(input: &Value) -> Result<(), CalibrationError> {
         "actuation_enabled",
     ] {
         if input.get(flag).and_then(Value::as_bool) != Some(false) {
-            return Err(bad("RI candidate attempted to claim unauthorized authority"));
+            return Err(bad(
+                "RI candidate attempted to claim unauthorized authority",
+            ));
         }
     }
     let time = input
@@ -168,17 +185,27 @@ fn validate_ri_ref(input: &Value) -> Result<(), CalibrationError> {
         return Err(bad("unsupported RI time fields"));
     }
     require_str(input.get("time").unwrap(), "clock_domain_id", 256)?;
-    if !time.get("boot_id").is_some_and(|v| {
-        v.is_null() || v.as_str().is_some_and(|s| !s.is_empty() && s.len() <= 128)
-    }) || time.get("received_monotonic_ns").and_then(Value::as_u64).is_none()
+    if !time
+        .get("boot_id")
+        .is_some_and(|v| v.is_null() || v.as_str().is_some_and(|s| !s.is_empty() && s.len() <= 128))
+        || time
+            .get("received_monotonic_ns")
+            .and_then(Value::as_u64)
+            .is_none()
     {
         return Err(bad("invalid RI clock domain / boot / receipt time"));
     }
     if require_str(input.get("time").unwrap(), "source_time_status", 64)? != "unknown"
-        || !time.get("source_measurement_time").is_some_and(Value::is_null)
-        || !time.get("chronograf_anchor_ref").is_some_and(Value::is_null)
+        || !time
+            .get("source_measurement_time")
+            .is_some_and(Value::is_null)
+        || !time
+            .get("chronograf_anchor_ref")
+            .is_some_and(Value::is_null)
     {
-        return Err(bad("source timestamp or Chronograf authority cannot be asserted"));
+        return Err(bad(
+            "source timestamp or Chronograf authority cannot be asserted",
+        ));
     }
     Ok(())
 }
@@ -218,34 +245,50 @@ fn validate_target(
         target.video_transport_format_claim.as_ref(),
         target.frame_a_id_claim.as_ref(),
         target.frame_b_id_claim.as_ref(),
-    ].into_iter().flatten() {
+    ]
+    .into_iter()
+    .flatten()
+    {
         if !nonempty(optional) {
             return Err(bad("invalid CAL artifact optional field"));
         }
     }
-    if target.model_sha256.as_ref().is_some_and(|x| {
-        !x.strip_prefix("sha256:").is_some_and(is_hex64)
-    }) {
+    if target
+        .model_sha256
+        .as_ref()
+        .is_some_and(|x| !x.strip_prefix("sha256:").is_some_and(is_hex64))
+    {
         return Err(bad("invalid CAL model_sha256 claim"));
     }
-    if target.resolution_sbs_claim_wh.is_some_and(|[w, h]| w == 0 || h == 0) {
+    if target
+        .resolution_sbs_claim_wh
+        .is_some_and(|[w, h]| w == 0 || h == 0)
+    {
         return Err(bad("resolution must be nonzero"));
     }
-    if target.checkerboard_square_mm_claim.is_some_and(|mm| !mm.is_finite() || mm <= 0.0) {
+    if target
+        .checkerboard_square_mm_claim
+        .is_some_and(|mm| !mm.is_finite() || mm <= 0.0)
+    {
         return Err(bad("invalid checkerboard square size"));
     }
     match target.artifact_kind {
         ArtifactKind::ExperimentalEstimate => {
             if profile.is_some() || target.contract_maturity != ContractMaturity::Experimental {
-                return Err(bad("experimental estimate cannot masquerade as a sealed CAL profile"));
+                return Err(bad(
+                    "experimental estimate cannot masquerade as a sealed CAL profile",
+                ));
             }
             Ok(None)
         }
         ArtifactKind::SealedProfile => {
             if target.contract_maturity != ContractMaturity::Candidate {
-                return Err(bad("sealed CAL profile must retain candidate maturity here"));
+                return Err(bad(
+                    "sealed CAL profile must retain candidate maturity here",
+                ));
             }
-            let p = profile.ok_or_else(|| bad("sealed profile reference requires actual CAL record"))?;
+            let p = profile
+                .ok_or_else(|| bad("sealed profile reference requires actual CAL record"))?;
             verify(p)?;
             if p.profile_id != target.artifact_id
                 || p.profile_id != target.revision
@@ -254,7 +297,9 @@ fn validate_target(
                 || target.model_ref.as_deref() != Some(p.model_ref.as_str())
                 || target.model_sha256.as_deref() != Some(p.model_sha256.as_str())
             {
-                return Err(bad("CAL profile revision / instance / model / digest mismatch"));
+                return Err(bad(
+                    "CAL profile revision / instance / model / digest mismatch",
+                ));
             }
             Ok(Some(p.state))
         }
@@ -282,10 +327,22 @@ pub fn associate_ri_observation(
     let (association_status, calibration_ref) = if let Some(target) = candidate {
         let mut matches = true;
         for (field, expected, code) in [
-            ("source_id", &target.expected_source_id, "source_id_mismatch"),
+            (
+                "source_id",
+                &target.expected_source_id,
+                "source_id_mismatch",
+            ),
             ("modality", &target.expected_modality, "modality_mismatch"),
-            ("reference_frame_id", &target.expected_reference_frame_id, "reference_frame_mismatch"),
-            ("payload_media_type", &target.expected_payload_media_type, "payload_media_type_mismatch"),
+            (
+                "reference_frame_id",
+                &target.expected_reference_frame_id,
+                "reference_frame_mismatch",
+            ),
+            (
+                "payload_media_type",
+                &target.expected_payload_media_type,
+                "payload_media_type_mismatch",
+            ),
         ] {
             if ri.get(field).and_then(Value::as_str) != Some(expected.as_str()) {
                 reasons.push(code.to_owned());

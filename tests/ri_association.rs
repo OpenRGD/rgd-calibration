@@ -68,8 +68,14 @@ fn experimental_reference_is_sidecar_and_never_updates_ri_ref() {
     assert_eq!(input, original);
     assert_eq!(result["schema_version"], CAL_RI_SCHEMA_VERSION);
     assert_eq!(result["observation_ref"], input);
-    assert_eq!(result["observation_ref"]["observation_id"], original["observation_id"]);
-    assert_eq!(result["observation_ref"]["payload_sha256_hex"], original["payload_sha256_hex"]);
+    assert_eq!(
+        result["observation_ref"]["observation_id"],
+        original["observation_id"]
+    );
+    assert_eq!(
+        result["observation_ref"]["payload_sha256_hex"],
+        original["payload_sha256_hex"]
+    );
     assert_eq!(result["calibration_ref"]["revision"], "estimate_01");
     assert_eq!(result["calibration_profile_state"], Value::Null);
     assert_eq!(result["association_status"], "candidate_metadata_match");
@@ -97,23 +103,42 @@ fn candidate_observation_without_local_hash_verification_is_flagged() {
     let mut ri = reference();
     ri["integrity_status"] = json!("not_verified");
     let result = associate_ri_observation(&ri, Some(&experimental()), None).unwrap();
-    assert_eq!(result["assurance"]["ri_reported_local_hash_verified"], false);
-    assert!(result["reasons"].as_array().unwrap().iter().any(|r| r == "ri_local_payload_hash_not_verified"));
+    assert_eq!(
+        result["assurance"]["ri_reported_local_hash_verified"],
+        false
+    );
+    assert!(result["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r == "ri_local_payload_hash_not_verified"));
 }
 
 #[test]
 fn mismatched_source_frame_media_and_modality_are_never_associated_as_compatible() {
     for (field, value, expected) in [
         ("source_id", "different_owner", "source_id_mismatch"),
-        ("reference_frame_id", "other.frame", "reference_frame_mismatch"),
-        ("payload_media_type", "video/raw", "payload_media_type_mismatch"),
+        (
+            "reference_frame_id",
+            "other.frame",
+            "reference_frame_mismatch",
+        ),
+        (
+            "payload_media_type",
+            "video/raw",
+            "payload_media_type_mismatch",
+        ),
         ("modality", "audio", "modality_mismatch"),
     ] {
         let mut ri = reference();
         ri[field] = json!(value);
         let out = associate_ri_observation(&ri, Some(&experimental()), None).unwrap();
         assert_eq!(out["association_status"], "incompatible_metadata");
-        assert!(out["reasons"].as_array().unwrap().iter().any(|v| v == expected));
+        assert!(out["reasons"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v == expected));
         assert_eq!(out["depth_consumer"]["metric_depth_allowed"], false);
     }
 }
@@ -161,8 +186,15 @@ fn missing_boot_and_unknown_capture_time_do_not_create_time_authority() {
     let mut ri = reference();
     ri["time"]["boot_id"] = Value::Null;
     let result = associate_ri_observation(&ri, Some(&experimental()), None).unwrap();
-    assert!(result["reasons"].as_array().unwrap().iter().any(|v| v == "ri_boot_unknown"));
-    assert_eq!(result["depth_consumer"]["source_exposure_time_status"], "unknown");
+    assert!(result["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|v| v == "ri_boot_unknown"));
+    assert_eq!(
+        result["depth_consumer"]["source_exposure_time_status"],
+        "unknown"
+    );
     assert_eq!(result["assurance"]["history_committed"], false);
 }
 
@@ -230,7 +262,11 @@ fn authentic_sealed_profile_is_not_a_physical_calibration_certificate() {
     let out = associate_ri_observation(&reference(), Some(&target), Some(&p)).unwrap();
     assert_eq!(out["assurance"]["cal_profile_seal_verified"], true);
     assert_eq!(out["calibration_profile_state"], "uncalibrated");
-    assert!(out["reasons"].as_array().unwrap().iter().any(|v| v == "calibration_profile_not_validated"));
+    assert!(out["reasons"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|v| v == "calibration_profile_not_validated"));
     assert_eq!(out["assurance"]["metrology_certified"], false);
     assert_eq!(out["depth_consumer"]["metric_depth_allowed"], false);
 }
@@ -260,7 +296,16 @@ fn sidecar_json_roundtrip_preserves_ri_ids_hash_and_unknown_physical_truth() {
     let bytes = serde_json::to_vec(&output).unwrap();
     let decoded: Value = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(decoded["observation_ref"], reference());
-    assert_eq!(decoded["depth_consumer"]["calibration_revision"], "estimate_01");
-    assert_eq!(decoded["depth_consumer"]["ab_physical_order_status"], "unknown");
-    assert_eq!(decoded["depth_consumer"]["camera_to_body_extrinsics_status"], "unknown");
+    assert_eq!(
+        decoded["depth_consumer"]["calibration_revision"],
+        "estimate_01"
+    );
+    assert_eq!(
+        decoded["depth_consumer"]["ab_physical_order_status"],
+        "unknown"
+    );
+    assert_eq!(
+        decoded["depth_consumer"]["camera_to_body_extrinsics_status"],
+        "unknown"
+    );
 }
