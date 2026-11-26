@@ -1,0 +1,138 @@
+{
+  "version": "cal-021-a-v1",
+  "note": "All examples are synthetic local Foundation documents; no physical evidence or canonical integrity claim.",
+  "cases": [
+    {
+      "id": "strict-json",
+      "syntax": "json",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"fixture_strict\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}}",
+      "accepted": true
+    },
+    {
+      "id": "jsonc-comments-trailing",
+      "syntax": "jsonc",
+      "raw": "{\n // synthetic\n \"meta_group\": {\"model_id_str\":\"fixture_jsonc\",},\n \"joint_topology_map\": {}, /* no hardware */\n \"sensors_mounting_map\": {},\n \"note\": \"https://example.test/a//b/*c*/,}\",\n}",
+      "accepted": true
+    },
+    {
+      "id": "escapes-in-string",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"fixture_escapes\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"note\":\"quote: \\\"; backslash: \\\\; literal: ,} //\",}",
+      "accepted": true
+    },
+    {
+      "id": "cr-comment",
+      "syntax": "jsonc",
+      "raw": "{//comment\r\"meta_group\":{\"model_id_str\":\"fixture_cr\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}}",
+      "accepted": true
+    },
+    {
+      "id": "unicode",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"fixture_unicode\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"note\":\"caffè 漢字\",}",
+      "accepted": true
+    },
+    {
+      "id": "unquoted-key-json5",
+      "syntax": "jsonc",
+      "raw": "{meta_group:{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}}",
+      "accepted": false
+    },
+    {
+      "id": "single-quotes-json5",
+      "syntax": "jsonc",
+      "raw": "{'meta_group':{'model_id_str':'bad'},'joint_topology_map':{},'sensors_mounting_map':{}}",
+      "accepted": false
+    },
+    {
+      "id": "hex-json5",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":0x10}",
+      "accepted": false
+    },
+    {
+      "id": "nan-json5",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":NaN}",
+      "accepted": false
+    },
+    {
+      "id": "infinity-json5",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":Infinity}",
+      "accepted": false
+    },
+    {
+      "id": "duplicate-root",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"first\"},\"meta_group\":{\"model_id_str\":\"second\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}}",
+      "accepted": false
+    },
+    {
+      "id": "duplicate-escaped-nested",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"first\",\"\\u006dodel_id_str\":\"second\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}}",
+      "accepted": false
+    },
+    {
+      "id": "empty-object-comma",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{,},\"sensors_mounting_map\":{}}",
+      "accepted": false
+    },
+    {
+      "id": "empty-array-comma",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":[,]}",
+      "accepted": false
+    },
+    {
+      "id": "double-comma",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},,\"x\":1}",
+      "accepted": false
+    },
+    {
+      "id": "token-splitting",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":1/*not a token join*/2}",
+      "accepted": false
+    },
+    {
+      "id": "missing-value",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":,}",
+      "accepted": false
+    },
+    {
+      "id": "unterminated-comment",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}} /* unfinished",
+      "accepted": false
+    },
+    {
+      "id": "strict-json-rejects-comment",
+      "syntax": "json",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{}} // comment",
+      "accepted": false
+    },
+    {
+      "id": "strict-json-rejects-trailing",
+      "syntax": "json",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},}",
+      "accepted": false
+    },
+    {
+      "id": "overflow-number",
+      "syntax": "jsonc",
+      "raw": "{\"meta_group\":{\"model_id_str\":\"bad\"},\"joint_topology_map\":{},\"sensors_mounting_map\":{},\"x\":1e999}",
+      "accepted": false
+    },
+    {
+      "id": "root-array",
+      "syntax": "jsonc",
+      "raw": "[]",
+      "accepted": false
+    }
+  ]
+}
