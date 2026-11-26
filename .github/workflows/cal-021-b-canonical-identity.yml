@@ -1,0 +1,35 @@
+name: CAL-021-B Canonical identity
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  core-owned-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout exact upstream Core
+        uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/openrgd
+          ref: afe1a831b950a4e6560f0285a0103fc4eaa343b7
+          path: _interop/core
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Core runtime and schema-test dependencies
+        run: python -m pip install 'typer>=0.9.0' 'rich>=13.0.0' 'jsonschema>=4.18,<5'
+      - name: Build passive CAL (default features)
+        run: cargo build --locked --bin rgd-calibration
+      - name: Verify Core schema and adapter behavior (actual pinned Core, offline)
+        env:
+          CAL_TEST_CORE: _interop/core
+          CAL_TEST_BINARY: target/debug/rgd-calibration
+        run: |
+          python -m unittest discover -s tests -p test_canonical_identity.py -v

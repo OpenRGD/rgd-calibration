@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openrgd:calibration:canonical-identity:v0.1-candidate",
+  "title": "CAL-021-B local source integrity assessment (candidate)",
+  "description": "Sidecar from Core-owned hashing and a same-snapshot passive CAL inspection. Not a canonical schema validation, completeness claim, signature, hardware binding, or CAL profile model hash binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "integrity_profile",
+    "core_reference_commit",
+    "core_code_pin_checked",
+    "integrity_status",
+    "declared_source_tree_sha256",
+    "computed_source_tree_sha256",
+    "indexed_file_count",
+    "report_binding_status",
+    "calibration_binary_sha256",
+    "calibration_report_stdout_sha256",
+    "calibration_report",
+    "reasons",
+    "bundle_completeness",
+    "canonical_schema_validated",
+    "physical_instance_id",
+    "robot_binding_verified",
+    "profile_model_hash_bound",
+    "physical_calibration_certified",
+    "actuation_enabled"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "cal.canonical-identity.v0.1-candidate"
+    },
+    "integrity_profile": {
+      "const": "OPENRGD_SOURCE_TREE_SHA256_V1"
+    },
+    "core_reference_commit": {
+      "const": "afe1a831b950a4e6560f0285a0103fc4eaa343b7"
+    },
+    "core_code_pin_checked": {
+      "type": "boolean"
+    },
+    "integrity_status": {
+      "enum": [
+        "not_checked",
+        "source_tree_unavailable",
+        "manifest_missing",
+        "unsupported_profile",
+        "verification_failed",
+        "verifier_unavailable",
+        "source_tree_hash_match",
+        "source_tree_hash_mismatch"
+      ]
+    },
+    "declared_source_tree_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "computed_source_tree_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "indexed_file_count": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "report_binding_status": {
+      "enum": [
+        "not_checked",
+        "inspection_failed",
+        "source_index_match",
+        "source_index_not_bound"
+      ]
+    },
+    "calibration_binary_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "calibration_report_stdout_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "calibration_report": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "report_version",
+            "profile_id",
+            "profile_binding",
+            "export_preview",
+            "source_digests",
+            "current_robot_position_observed",
+            "physical_drift_evaluated",
+            "claims_physical_calibration_certified"
+          ],
+          "properties": {
+            "report_version": {
+              "const": "0.2.0"
+            },
+            "profile_id": {
+              "type": "null"
+            },
+            "profile_binding": {
+              "const": "no_profile"
+            },
+            "export_preview": {
+              "type": "null"
+            },
+            "source_digests": {
+              "type": "array",
+              "minItems": 1
+            },
+            "current_robot_position_observed": {
+              "const": false
+            },
+            "physical_drift_evaluated": {
+              "const": false
+            },
+            "claims_physical_calibration_certified": {
+              "const": false
+            }
+          }
+        }
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "bundle_completeness": {
+      "const": "not_assessed"
+    },
+    "canonical_schema_validated": {
+      "const": false
+    },
+    "physical_instance_id": {
+      "type": "null"
+    },
+    "robot_binding_verified": {
+      "const": false
+    },
+    "profile_model_hash_bound": {
+      "const": false
+    },
+    "physical_calibration_certified": {
+      "const": false
+    },
+    "actuation_enabled": {
+      "const": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "integrity_status": {
+            "enum": [
+              "source_tree_hash_match",
+              "source_tree_hash_mismatch"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "core_code_pin_checked": {
+            "const": true
+          },
+          "declared_source_tree_sha256": {
+            "type": "string"
+          },
+          "computed_source_tree_sha256": {
+            "type": "string"
+          },
+          "indexed_file_count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "report_binding_status": {
+            "enum": [
+              "source_index_match",
+              "source_index_not_bound"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "calibration_report": {
+            "type": "object"
+          },
+          "calibration_binary_sha256": {
+            "type": "string"
+          },
+          "calibration_report_stdout_sha256": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "report_binding_status": {
+            "const": "source_index_match"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "integrity_status": {
+            "enum": [
+              "source_tree_hash_match",
+              "source_tree_hash_mismatch"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
