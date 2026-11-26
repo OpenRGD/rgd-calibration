@@ -185,13 +185,14 @@ fn validate_ri_ref(input: &Value) -> Result<(), CalibrationError> {
         return Err(bad("unsupported RI time fields"));
     }
     require_str(input.get("time").unwrap(), "clock_domain_id", 256)?;
-    if !time
-        .get("boot_id")
-        .is_some_and(|v| v.is_null() || v.as_str().is_some_and(|s| !s.is_empty() && s.chars().count() <= 128))
-        || time
-            .get("received_monotonic_ns")
-            .and_then(Value::as_u64)
-            .is_none()
+    if !time.get("boot_id").is_some_and(|v| {
+        v.is_null()
+            || v.as_str()
+                .is_some_and(|s| !s.is_empty() && s.chars().count() <= 128)
+    }) || time
+        .get("received_monotonic_ns")
+        .and_then(Value::as_u64)
+        .is_none()
     {
         return Err(bad("invalid RI clock domain / boot / receipt time"));
     }

@@ -182,7 +182,9 @@ fn main() {
     let mut dangling = p.clone();
     dangling.measurements[0].evidence_ids = vec!["missing".into()];
     let mut duplicate = p.clone();
-    duplicate.measurements[0].evidence_ids.push("synthetic_claim".into());
+    duplicate.measurements[0]
+        .evidence_ids
+        .push("synthetic_claim".into());
     let mut unknown_zero = p.clone();
     unknown_zero.joint_zero_references[0].evidence_ids = vec!["missing".into()];
     let mut altered = p.clone();
