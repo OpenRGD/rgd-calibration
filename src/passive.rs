@@ -520,16 +520,21 @@ pub fn inspect_passive(
     let model_id = description
         .pointer("/meta_group/model_id_str")
         .and_then(Value::as_str)
-        .filter(|value| !value.is_empty())
+        .filter(|value| !value.trim().is_empty())
         .ok_or_else(|| {
-            CalibrationError::Invalid("description.meta_group.model_id_str missing".into())
+            CalibrationError::Invalid("CAL_BUNDLE_REQUIRED_FIELD: description.meta_group.model_id_str missing or blank".into())
         })?;
     let joints = map(description, "joint_topology_map").ok_or_else(|| {
-        CalibrationError::Invalid("description.joint_topology_map must be an object".into())
+        CalibrationError::Invalid("CAL_BUNDLE_REQUIRED_FIELD: description.joint_topology_map must be an object".into())
     })?;
     let sensors = map(description, "sensors_mounting_map").ok_or_else(|| {
-        CalibrationError::Invalid("description.sensors_mounting_map must be an object".into())
+        CalibrationError::Invalid("CAL_BUNDLE_REQUIRED_FIELD: description.sensors_mounting_map must be an object".into())
     })?;
+    if joints.values().chain(sensors.values()).any(|entry| !entry.is_object()) {
+        return Err(CalibrationError::Invalid(
+            "CAL_BUNDLE_REQUIRED_FIELD: joint and sensor entries must be objects".into(),
+        ));
+    }
     let joint_ids: BTreeSet<&str> = joints.keys().map(String::as_str).collect();
     let sensor_ids: BTreeSet<&str> = sensors.keys().map(String::as_str).collect();
     let actuators = map(description, "actuators_topology_map");
@@ -538,15 +543,22 @@ pub fn inspect_passive(
         .unwrap_or_default();
 
     let mut findings = Vec::new();
-    if bundle.calibration.is_none() {
-        finding(
-            &mut findings,
-            Severity::Information,
-            "optional_source_not_provided",
-            "bundle",
-            "calibration",
-            "No calibration file was present; no correction values are assumed.",
-        );
+    for (role, present) in [
+        ("calibration", bundle.calibration.is_some()),
+        ("actuation_topology", bundle.actuation_topology.is_some()),
+        ("hal_mapping", bundle.hal_mapping.is_some()),
+        ("sensor_fidelity", bundle.sensor_fidelity.is_some()),
+    ] {
+        if !present {
+            finding(
+                &mut findings,
+                Severity::Information,
+                "optional_source_not_provided",
+                "bundle",
+                role,
+                "Optional Foundation file absent; no values are inferred from another root.",
+            );
+        }
     }
     let mut stored: BTreeMap<&str, Vec<Measurement>> = BTreeMap::new();
     if let Some(profile) = profile {

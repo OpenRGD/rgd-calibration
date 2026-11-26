@@ -1,0 +1,41 @@
+name: CAL-021-A Console interoperability
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  pinned-console-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout CAL candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout released Console v0.4.3 (immutable reference)
+        uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-console
+          ref: a0ef857cf425c1bb14ad8f62acec21f8c1324866
+          path: _interop/console
+          persist-credentials: false
+      - name: Checkout released Registry (immutable reference)
+        uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-modules
+          ref: 0268b3748042d04fd3561553616388368881e04a
+          path: _interop/registry
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build candidate CAL binary without RI feature
+        run: cargo build --locked --bin rgd-calibration
+      - name: Real Console extraction and report compatibility (synthetic, offline)
+        run: |
+          python3 scripts/test_console_bundle_compat.py \
+            --console _interop/console \
+            --registry _interop/registry \
+            --binary target/debug/rgd-calibration
