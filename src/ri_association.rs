@@ -78,7 +78,7 @@ fn require_str<'a>(
         .get(key)
         .and_then(Value::as_str)
         .ok_or_else(|| bad(&format!("RI reference missing string: {key}")))?;
-    if value.is_empty() || value.len() > max_len {
+    if value.is_empty() || value.chars().count() > max_len {
         return Err(bad(&format!("RI reference bad string length: {key}")));
     }
     Ok(value)
@@ -187,7 +187,7 @@ fn validate_ri_ref(input: &Value) -> Result<(), CalibrationError> {
     require_str(input.get("time").unwrap(), "clock_domain_id", 256)?;
     if !time
         .get("boot_id")
-        .is_some_and(|v| v.is_null() || v.as_str().is_some_and(|s| !s.is_empty() && s.len() <= 128))
+        .is_some_and(|v| v.is_null() || v.as_str().is_some_and(|s| !s.is_empty() && s.chars().count() <= 128))
         || time
             .get("received_monotonic_ns")
             .and_then(Value::as_u64)
@@ -211,7 +211,7 @@ fn validate_ri_ref(input: &Value) -> Result<(), CalibrationError> {
 }
 
 fn nonempty(s: &str) -> bool {
-    !s.trim().is_empty() && s.len() <= 256
+    !s.trim().is_empty() && s.chars().count() <= 256
 }
 
 fn validate_target(
