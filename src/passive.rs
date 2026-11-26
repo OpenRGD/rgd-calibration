@@ -522,15 +522,26 @@ pub fn inspect_passive(
         .and_then(Value::as_str)
         .filter(|value| !value.trim().is_empty())
         .ok_or_else(|| {
-            CalibrationError::Invalid("CAL_BUNDLE_REQUIRED_FIELD: description.meta_group.model_id_str missing or blank".into())
+            CalibrationError::Invalid(
+                "CAL_BUNDLE_REQUIRED_FIELD: description.meta_group.model_id_str missing or blank"
+                    .into(),
+            )
         })?;
     let joints = map(description, "joint_topology_map").ok_or_else(|| {
-        CalibrationError::Invalid("CAL_BUNDLE_REQUIRED_FIELD: description.joint_topology_map must be an object".into())
+        CalibrationError::Invalid(
+            "CAL_BUNDLE_REQUIRED_FIELD: description.joint_topology_map must be an object".into(),
+        )
     })?;
     let sensors = map(description, "sensors_mounting_map").ok_or_else(|| {
-        CalibrationError::Invalid("CAL_BUNDLE_REQUIRED_FIELD: description.sensors_mounting_map must be an object".into())
+        CalibrationError::Invalid(
+            "CAL_BUNDLE_REQUIRED_FIELD: description.sensors_mounting_map must be an object".into(),
+        )
     })?;
-    if joints.values().chain(sensors.values()).any(|entry| !entry.is_object()) {
+    if joints
+        .values()
+        .chain(sensors.values())
+        .any(|entry| !entry.is_object())
+    {
         return Err(CalibrationError::Invalid(
             "CAL_BUNDLE_REQUIRED_FIELD: joint and sensor entries must be objects".into(),
         ));

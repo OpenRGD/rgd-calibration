@@ -75,19 +75,21 @@ fn source_digest_is_over_exact_original_bytes() {
 
 #[test]
 fn spec_has_priority_and_no_cross_root_optional_backfill() {
-    let dir = bundle("spec/01_foundation/description.jsonc", DESCRIPTION.as_bytes());
+    let dir = bundle(
+        "spec/01_foundation/description.jsonc",
+        DESCRIPTION.as_bytes(),
+    );
     write(
         dir.path(),
         "standard/01_foundation/description.json",
         DESCRIPTION.as_bytes(),
     );
-    write(
-        dir.path(),
-        "standard/01_foundation/calibration.json",
-        b"{}",
-    );
+    write(dir.path(), "standard/01_foundation/calibration.json", b"{}");
     let loaded = BundleSource::load(dir.path()).unwrap();
-    assert_eq!(loaded.description.path, "spec/01_foundation/description.jsonc");
+    assert_eq!(
+        loaded.description.path,
+        "spec/01_foundation/description.jsonc"
+    );
     assert!(loaded.calibration.is_none());
 }
 
@@ -106,7 +108,10 @@ fn malformed_preferred_spec_does_not_fall_back_to_valid_mirror() {
 
 #[test]
 fn same_role_dual_extensions_are_rejected() {
-    let dir = bundle("spec/01_foundation/description.jsonc", DESCRIPTION.as_bytes());
+    let dir = bundle(
+        "spec/01_foundation/description.jsonc",
+        DESCRIPTION.as_bytes(),
+    );
     write(
         dir.path(),
         "spec/01_foundation/description.json",
@@ -120,7 +125,10 @@ fn same_role_dual_extensions_are_rejected() {
 
 #[test]
 fn optional_role_dual_extensions_are_rejected() {
-    let dir = bundle("spec/01_foundation/description.jsonc", DESCRIPTION.as_bytes());
+    let dir = bundle(
+        "spec/01_foundation/description.jsonc",
+        DESCRIPTION.as_bytes(),
+    );
     write(dir.path(), "spec/01_foundation/calibration.jsonc", b"{}");
     write(dir.path(), "spec/01_foundation/calibration.json", b"{}");
     assert!(BundleSource::load(dir.path())
@@ -152,7 +160,10 @@ fn local_layouts_and_mixed_unique_roles_remain_supported() {
 
 #[test]
 fn absent_optional_sources_are_reported_not_invented() {
-    let dir = bundle("spec/01_foundation/description.jsonc", DESCRIPTION.as_bytes());
+    let dir = bundle(
+        "spec/01_foundation/description.jsonc",
+        DESCRIPTION.as_bytes(),
+    );
     let loaded = BundleSource::load(dir.path()).unwrap();
     let report = inspect_passive(&loaded, None, &InspectionContext::default()).unwrap();
     assert_eq!(report.coverage.candidate_fields, 0);

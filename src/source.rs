@@ -130,7 +130,10 @@ fn load_one(
     let file = File::open(&path)?;
     let metadata = file.metadata()?;
     if !metadata.is_file() || metadata.len() > MAX_SOURCE_BYTES {
-        return Err(invalid("CAL_BUNDLE_SIZE", "source exceeds 4 MiB or is not regular"));
+        return Err(invalid(
+            "CAL_BUNDLE_SIZE",
+            "source exceeds 4 MiB or is not regular",
+        ));
     }
     let mut raw = Vec::new();
     file.take(MAX_SOURCE_BYTES + 1).read_to_end(&mut raw)?;
@@ -238,15 +241,17 @@ impl<'de> Visitor<'de> for UniqueVisitor {
 /// comments and a single trailing comma after a real value. JSON5-only
 /// constructs are not rewritten. Raw source bytes remain the hash preimage.
 pub fn parse_source_object(raw: &[u8], jsonc: bool) -> Result<Value, CalibrationError> {
-    std::str::from_utf8(raw)
-        .map_err(|_| invalid("CAL_BUNDLE_UTF8", "source is not UTF-8"))?;
+    std::str::from_utf8(raw).map_err(|_| invalid("CAL_BUNDLE_UTF8", "source is not UTF-8"))?;
     let value = if jsonc {
         serde_json::from_slice::<UniqueValue>(&normalize_jsonc(raw)?)?.0
     } else {
         serde_json::from_slice::<UniqueValue>(raw)?.0
     };
     if !value.is_object() {
-        return Err(invalid("CAL_BUNDLE_REQUIRED_FIELD", "source must be a JSON object"));
+        return Err(invalid(
+            "CAL_BUNDLE_REQUIRED_FIELD",
+            "source must be a JSON object",
+        ));
     }
     Ok(value)
 }
@@ -256,8 +261,7 @@ pub fn parse_source_object(raw: &[u8], jsonc: bool) -> Result<Value, Calibration
 /// with whitespace. Invalid JSON remains invalid; do not repair empty/comma-only
 /// containers or missing values.
 pub fn normalize_jsonc(input: &[u8]) -> Result<Vec<u8>, CalibrationError> {
-    std::str::from_utf8(input)
-        .map_err(|_| invalid("CAL_BUNDLE_UTF8", "source is not UTF-8"))?;
+    std::str::from_utf8(input).map_err(|_| invalid("CAL_BUNDLE_UTF8", "source is not UTF-8"))?;
     let mut out = input.to_vec();
     let mut i = 0usize;
     let mut in_string = false;
