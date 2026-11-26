@@ -113,6 +113,8 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 
 ## P0 — CAL-0.2.1: Console/Registry readiness and contract hardening
 
+**Wave status (2026-11-26):** CAL-021-A [PR #7](https://github.com/OpenRGD/rgd-calibration/pull/7) merged after default/RI and pinned Console Module Agent CI. [CAL-021-B candidate](CAL_021_B_CANONICAL_IDENTITY.md) adds a separately invoked Core-owned source-tree integrity assessment; profile binding, full Console ingestion, schema/completeness validation and Registry rollout remain independent gates.
+
 **Why first:** guided/active calibration is premature until the first module can reliably inspect a real **imported** RGD bundle without claiming false identity or measurements.
 
 ### CAL-021-A — end-to-end operational acceptance
