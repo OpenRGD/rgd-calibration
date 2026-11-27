@@ -6,11 +6,13 @@ An independent, offline-first Rust module for calibration profile provenance, me
 
 ## Experimental and RI integration boundaries
 
-The [OCCHI stereo experiment (PR #4)](https://github.com/OpenRGD/rgd-calibration/pull/4) and [Reality Ingress candidate adapter (PR #5)](https://github.com/OpenRGD/rgd-calibration/pull/5) are merged as **optional experimental code**, separate from the CAL-0.2 release. OCCHI requires explicit acquisition-owner acknowledgment; RI is only compiled with `--features ri-candidate` (disabled by default). Stereo fitting is not physical calibration acceptance; RI provenance/observation references do not authenticate a sensor or grant media access, depth-in-meters or motion. See the [consolidation checklist](docs/CALIBRATION_MASTER_CHECKLIST.md#pr-consolidation--ri-integration-01--review-snapshot-2026-11-25).
+The [OCCHI stereo experiment (PR #4)](https://github.com/OpenRGD/rgd-calibration/pull/4) and [Reality Ingress candidate adapter (PR #5)](https://github.com/OpenRGD/rgd-calibration/pull/5) are merged as **optional experimental code**, separate from the CAL-0.2 release. OCCHI requires explicit acquisition-owner acknowledgment; RI is only compiled with `--features ri-candidate` (disabled by default). Stereo fitting is not physical calibration acceptance; RI provenance/observation references do not authenticate a sensor or grant media access, depth-in-meters or motion. See the [consolidation checklist](docs/CALIBRATION_MASTER_CHECKLIST.md#pr-consolidation--ri-integration-01--status-verified-2026-11-25).
 
 ## Development roadmap
 
 The **[Calibration Master Development Checklist](docs/CALIBRATION_MASTER_CHECKLIST.md)** is the source of truth for completed milestones, next steps, quality gates and cross-repository dependencies. CAL-0.1/0.2 are merged and CI-verified; guided sessions, host-level Console acceptance, active calibration and continuous drift monitoring are not yet complete.
+
+**CAL-0.2.1 development status:** [A — bundle/parser](docs/CAL_021_A_BUNDLE_COMPATIBILITY.md), [B — canonical identity](docs/CAL_021_B_CANONICAL_IDENTITY.md) and [C — contract conformance](docs/CAL_021_C_CONTRACT_VALIDATION.md) are merged as source changes. [Owner response register and remaining release gates](docs/CAL_021_ABC_CONSOLIDATION.md). The Registry still distributes the original CAL-0.2.0 pin; D/E/F are not released.
 
 ## Candidate RI checks (explicit opt-in)
 
