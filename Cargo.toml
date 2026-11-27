@@ -18,3 +18,8 @@ serde_json = "1.0"
 sha2 = "0.10"
 tempfile = "3"
 thiserror = "2.0"
+
+# Test-only contract exchange fixture; never installed as a module command.
+[[example]]
+name = "contract_exchange"
+required-features = ["ri-candidate"]

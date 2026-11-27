@@ -159,7 +159,7 @@
           "stored_measurements": {
             "type": "array",
             "items": {
-              "$ref": "./calibration-profile.v0.1.schema.json#/$defs/Measurement"
+              "$ref": "https://openrgd.org/schemas/rgd-calibration/0.1.0/profile#/$defs/Measurement"
             }
           },
           "coverage": {

@@ -69,6 +69,11 @@ fn check_evidence_refs(
             "{name} must link to at least one existing evidence id"
         )));
     }
+    if refs.iter().collect::<HashSet<_>>().len() != refs.len() {
+        return Err(CalibrationError::Invalid(format!(
+            "{name} contains duplicate evidence references"
+        )));
+    }
     Ok(())
 }
 
@@ -188,7 +193,7 @@ pub fn validate(profile: &CalibrationProfile) -> Result<(), CalibrationError> {
         if let Some(homing) = &joint.homing_procedure_ref {
             require(homing, "joint.homing_procedure_ref")?;
         }
-        if angles.iter().any(Option::is_some) {
+        if angles.iter().any(Option::is_some) || !joint.evidence_ids.is_empty() {
             check_evidence_refs(&joint.evidence_ids, &evidence_ids, "joint_zero_reference")?;
         }
     }
