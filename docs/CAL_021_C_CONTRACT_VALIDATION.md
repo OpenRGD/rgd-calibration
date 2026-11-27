@@ -1,6 +1,6 @@
 # CAL-021-C — Contract Validation & Cross-Repository Testing
 
-**Candidate verification wave.** No new production API, module install, canonical contract, physical commissioning or authority. The default CLI still produces passive report v0.2.0. CAL-021-B is merged as an optional local sidecar.
+**Candidate verification wave, merged in CAL PR #9.** No new production API, module install, canonical contract, physical commissioning or authority. The default CLI still produces passive report v0.2.0. CAL-021-B is merged as an optional local sidecar.
 
 ## Pinned verification matrix
 
@@ -33,6 +33,8 @@ The fixture exporter `examples/contract_exchange.rs` is test-only and requires t
 See `.github/workflows/cal-021-c-contracts.yml`. Check out the four exact upstream refs into isolated local directories, install the listed test dependencies, build the default binary and the opt-in example, then run `scripts/test_contract_exchange.py` with those paths. Checkout and dependency setup need network; the test uses only local inputs/outputs and no device access.
 
 ## Owner handoffs
+
+Current status and subsequent owner responses are recorded in the [A/B/C consolidation register](CAL_021_ABC_CONSOLIDATION.md). The original test revision and historical handoff evidence remain unchanged.
 
 - [Console](handoffs/CAL-021-C-TO-CONSOLE.md) — consumer hardening and full source snapshot boundary.
 - [Core](handoffs/CAL-021-C-TO-CORE.md) — canonical verifier authority and parser/manifest limits.

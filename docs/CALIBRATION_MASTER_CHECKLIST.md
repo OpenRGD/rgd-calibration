@@ -1,6 +1,6 @@
 # OpenRGD Calibration — Master Development Checklist
 
-**Status reviewed:** 2026-11-25  
+**Status reviewed:** 2026-11-27  
 **Scope:** `OpenRGD/rgd-calibration` (Rust, offline-first, hardware-agnostic) and its versioned contracts with Canonical Core, Module Registry, Console, Chronograf/Chronon and Somatic Runtime.  
 **Rule:** `[x]` means verified in the existing source/CI **for that scope only**; `[ ]` means not yet proven or implemented. Passing synthetic tests never constitutes a physical robot calibration.
 
@@ -113,38 +113,62 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 
 ## P0 — CAL-0.2.1: Console/Registry readiness and contract hardening
 
-**Wave status (2026-11-26):** CAL-021-A [PR #7](https://github.com/OpenRGD/rgd-calibration/pull/7) merged after default/RI and pinned Console Module Agent CI. [CAL-021-B candidate](CAL_021_B_CANONICAL_IDENTITY.md) adds a separately invoked Core-owned source-tree integrity assessment; profile binding, full Console ingestion, schema/completeness validation and Registry rollout remain independent gates.
+**Wave status (2026-11-27):** A/B/C merged in Calibration source; CAL-021-D/E/F remain gated. See [consolidation and owner response register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
 
-**Why first:** guided/active calibration is premature until the first module can reliably inspect a real **imported** RGD bundle without claiming false identity or measurements.
+**Why first:** guided/active calibration is premature until the first module can reliably inspect a real imported RGD bundle without claiming false identity or measurements.
 
-### CAL-021-A — end-to-end operational acceptance
+### CAL-021-A — Bundle & Parser Compatibility
 
-- [ ] Test Console v0.4 Docker Compose `api + web + module-agent + gateway` on Ubuntu 22.04 mini-PC and Fedora notebook; preserve `console_data` and `module_data`.
+- [x] Define the conservative JSON/JSONC subset, source precedence, bounded reads, rejection of duplicates/ambiguity, explicit missing fields and exact byte hashes; [PR #7](https://github.com/OpenRGD/rgd-calibration/pull/7) merged.
+- [x] Exercise the 22-case syntax corpus and 27 pinned Console Module Agent extraction/report checks, including six negative ZIP tests.
+- [ ] Align the Console JSON5 importer/Agent compatibility diagnostics; reject unsupported syntax explicitly rather than silently altering uploaded bytes. Preserve model use outside Calibration.
+- [ ] Add remaining cross-layer ZIP traversal/size/symlink/decompression-bomb and parser-fuzz tests spanning both Console importer and Calibration reader.
+
+### CAL-021-B — Canonical Identity & Provenance
+
+- [x] Reuse the Core-owned actual OPENRGD_SOURCE_TREE_SHA256_V1 implementation on the full available private spec snapshot and check every CAL source file against the resulting index; [PR #8](https://github.com/OpenRGD/rgd-calibration/pull/8) merged.
+- [x] Pass 15 identity regressions, including pinned Core 76-file reference, non-Foundation mutation, partial manifest, unindexed input and no source mutation.
+- [ ] Confirm Core-supported verifier interface, version and completeness/schema checking independently of a root-hash match.
+- [ ] Distinguish source_tree_hash_match, structural parsing, partial Foundation, and unknown identity in the Console API/UI. Do not equate a hash match with canonical schema acceptance or physical binding.
+- [ ] Produce a deterministic model-version/physical-instance binding reference; no automatic assignment of legacy profile model_sha256 or alias inference from similar joint names.
+- [ ] Plan, review and test explicit mapping proposals for knee_joint_right vs leg_right_knee_pitch and other Core example discrepancies; make no normative Core change without approved RFC.
+- [ ] Complete consumer stable error mapping and versioned report adapter; unknown fields must never become implicit valid calibration.
+
+### CAL-021-C — Contract Validation & Cross-Repository Testing
+
+- [x] Resolve the Measurement schema reference locally and validate Rust-emitted profiles, position records, reports and candidate sidecars against seven owner schemas; [PR #9](https://github.com/OpenRGD/rgd-calibration/pull/9) merged.
+- [x] Enforce unique evidence links, reject dangling zero-reference evidence and use RI Unicode character counts. Preserve legacy profile review/migration rather than automatically resealing.
+- [x] Exercise the actual pinned RI producer/store and Console Module Agent, actual Core verifier, and CAL Rust exchange fixture; characterize known incompatibilities instead of hiding them.
+- [x] Publish [Console](handoffs/CAL-021-C-TO-CONSOLE.md), [Core](handoffs/CAL-021-C-TO-CORE.md), [RI](handoffs/CAL-021-C-TO-REALITY-INGRESS.md) and [Registry](handoffs/CAL-021-C-TO-REGISTRY.md) handoffs.
+- [x] Record RI-A02B owner response as a proposed native-u64 profile and separate evidence entry, without repinning the frozen RI consumer schema.
+- [ ] Review remaining owner responses; agree the RI numeric transport boundary including JS lossless encoding above 2^53-1. The RI-A02B proposal is not accepted wire policy or enabled functionality.
+- [ ] Complete property/fuzz tests for canonical ref paths, units, NaN/infinite input, truncated evidence, duplicate IDs, corrupted revisions and recursive/symlink paths.
+- [ ] Characterize and resolve any affected historical profile compatibility without changing or resealing existing evidence.
+
+### CAL-021-D — Registry & Console Compatibility (held for owner responses)
+
+- [ ] Review the Console, Core and RI return handoffs against the exact tested revisions; distinguish acknowledged, resolved, deferred and release-blocking gaps.
+- [ ] Re-run affected consumer conformance checks against reviewed owner candidate revisions before changing a pin.
+- [ ] Define compatibility matrix Calibration module version -> Registry descriptor -> Console adapter/report version and migration strategy; retain the old installed version and original immutable commit pin.
+- [ ] Keep a single documented CLI JSON contract for Console's inspect; library-only capabilities, candidate RI feature, OCCHI and test-only exporter must not be advertised as executable CLI verbs.
+- [ ] Review full report schema/context/source-digest checks, full bounded source tree provenance and explicit unsupported/unknown outcomes on the Console side; preserve non-actuating isolation.
+- [ ] Prepare coordinated new-version proposal and install/upgrade plan in reviewable PRs; do not distribute or replace CAL-0.2.0 until D/E/F gates are accepted.
+
+### CAL-021-E — End-to-End & Rollback
+
+- [ ] Test Console v0.4.3 or reviewed successor Docker Compose api + web + module-agent + gateway on Ubuntu 22.04 mini-PC and Fedora notebook; preserve console_data and module_data.
 - [ ] Verify exact installed Registry pin/version, checksum, module state and immutable source commit through the Console interface.
 - [ ] UI flow: browse -> explicit consent -> install -> verify -> select imported RGD -> inspect -> view report.
-- [ ] Test offline restart with installed binary, retained imports and no implicit network requirement for inspection.
+- [ ] Test offline restart with installed binary, retained imports, no implicit inspection network requirement, and rollback to the known previous version.
 - [ ] Verify error states: no Git/Cargo/network, missing binary, corrupted install, unverified model, invalid ZIP, disconnected agent, no imported models, unsupported host.
-- [ ] Keep the module sidecar without device/Docker-socket mounts and host ports, and keep the Console loopback/tunnel-only until actual authentication exists.
+- [ ] Keep the module sidecar without device/Docker-socket mounts and host ports, and keep Console loopback/tunnel-only until actual authentication exists.
 
-### CAL-021-B — model provenance and parser compatibility
+### CAL-021-F — Release Candidate
 
-- [ ] Define an exact RGD bundle input contract between Console's JSON5-capable importer and Calibration's JSON/JSONC parser; **reject unsupported syntax explicitly** rather than silently altering input.
-- [ ] Implement/consume the Canonical Core's actual `OPENRGD_SOURCE_TREE_SHA256_V1` or accepted equivalent; never substitute an arbitrary raw file digest or a caller assertion.
-- [ ] Distinguish `canonical_verified`, `structurally_parsed`, `partial_foundation` and `unknown` in API and UI.
-- [ ] Produce a deterministic model-version/physical-instance binding reference; no alias inference from similar joint names.
-- [ ] Plan, review and test explicit mapping proposals for `knee_joint_right` vs `leg_right_knee_pitch` and other Core example discrepancies; make **no normative Core change** without approved RFC.
-- [ ] Establish structured error codes and a versioned report adapter; unknown fields must never become implicit valid calibration.
-- [ ] Add ZIP traversal/size/symlink/decompression-bomb and parser-fuzz negative tests spanning both Console importer and Calibration reader.
+- [ ] Confirm reviewed D/E results, publication metadata, version-specific compatibility and rollback; human release approval separate from merge.
+- [ ] Define signed/provenance-attested distribution policy for production; commit pin + Cargo.lock + local SHA-256 are not independent signatures.
 
-### CAL-021-C — contract/release discipline
-
-- [ ] Add Rust <-> JSON Schema conformance fixtures for profiles and passive reports (beyond merely parsing schema documents).
-- [ ] Add property/fuzz tests for canonical ref paths, units, NaN/infinite input, truncated evidence, duplicate IDs, corrupted revisions and recursive/symlink paths.
-- [ ] Define compatibility matrix `Calibration module version -> Registry descriptor -> Console adapter/report version` and a migration strategy.
-- [ ] Keep a single documented CLI JSON contract for Console's `inspect`; library-only Rust capabilities must not be advertised as executable CLI verbs.
-- [ ] Define signed/provenance-attested distribution policy for production; commit pin + Cargo.lock + local SHA-256 are **not** independent signatures.
-
-**CAL-0.2.1 acceptance gate:** import an RGD in Console on each supported host, explicitly install the pinned Calibration binary, inspect it read-only, display all unknowns honestly, and survive offline restart. Tests and logs prove **zero actuation**. Do not call this a successful physical calibration.
+**CAL-0.2.1 acceptance gate:** import an RGD in Console on each supported host, explicitly install the pinned Calibration binary, inspect it read-only, display all unknowns honestly, survive offline restart and verify rollback. Tests and logs must demonstrate zero actuation. This is not a successful physical calibration.
 
 ---
 
