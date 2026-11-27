@@ -14,7 +14,9 @@ CAL-021-C exercises actual RI producers, actual Core and actual Console Module A
 
 All three code waves are in main. The tested external revisions remain historical pins; do not silently change the baseline after an owner sends a new candidate.
 
-## Owner response register
+## Owner response register (historical snapshot before Console/Core returns)
+
+**Subsequent review:** all three returns have been received. See [D.1 reconciliation](CAL_021_D1_RECONCILIATION.md) for their exact revisions, updated dispositions, independent candidate test plan and remaining gates. The table below preserves the earlier coordination state.
 
 | Owner | Outbound | Return status at this review | Gate |
 | --- | --- | --- | --- |

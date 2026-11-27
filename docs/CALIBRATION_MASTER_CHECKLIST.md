@@ -113,7 +113,7 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 
 ## P0 — CAL-0.2.1: Console/Registry readiness and contract hardening
 
-**Wave status (2026-11-27):** A/B/C merged in Calibration source; CAL-021-D/E/F remain gated. See [consolidation and owner response register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
+**Wave status (2026-11-27):** A/B/C merged in Calibration source; all three owner returns reviewed. [D.1 reconciliation candidate](CAL_021_D1_RECONCILIATION.md) precedes D.2 compatibility planning; E/F remain gated. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
 
 **Why first:** guided/active calibration is premature until the first module can reliably inspect a real imported RGD bundle without claiming false identity or measurements.
 
@@ -141,14 +141,16 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 - [x] Exercise the actual pinned RI producer/store and Console Module Agent, actual Core verifier, and CAL Rust exchange fixture; characterize known incompatibilities instead of hiding them.
 - [x] Publish [Console](handoffs/CAL-021-C-TO-CONSOLE.md), [Core](handoffs/CAL-021-C-TO-CORE.md), [RI](handoffs/CAL-021-C-TO-REALITY-INGRESS.md) and [Registry](handoffs/CAL-021-C-TO-REGISTRY.md) handoffs.
 - [x] Record RI-A02B owner response as a proposed native-u64 profile and separate evidence entry, without repinning the frozen RI consumer schema.
-- [ ] Review remaining owner responses; agree the RI numeric transport boundary including JS lossless encoding above 2^53-1. The RI-A02B proposal is not accepted wire policy or enabled functionality.
+- [x] Review remaining owner responses (Console, Core and RI) and record their exact evidence in the D.1 reconciliation document.
+- [ ] Agree and test a lossless versioned JSON/JS transport above 2^53-1 before enabling a consumer that needs that domain. RI native-u64 is a compatible candidate subset, not a released wire policy.
 - [ ] Complete property/fuzz tests for canonical ref paths, units, NaN/infinite input, truncated evidence, duplicate IDs, corrupted revisions and recursive/symlink paths.
 - [ ] Characterize and resolve any affected historical profile compatibility without changing or resealing existing evidence.
 
-### CAL-021-D — Registry & Console Compatibility (held for owner responses)
+### CAL-021-D — Registry & Console Compatibility
 
-- [ ] Review the Console, Core and RI return handoffs against the exact tested revisions; distinguish acknowledged, resolved, deferred and release-blocking gaps.
-- [ ] Re-run affected consumer conformance checks against reviewed owner candidate revisions before changing a pin.
+- [x] D.1: Review the three owner returns, exact revisions and disposition in [CAL-021-D.1](CAL_021_D1_RECONCILIATION.md).
+- [ ] D.1: Accept the new candidate reconciliation after CI on the reviewable PR, retaining all A/B/C historical pins.
+- [ ] D.2: Review cross-repository version/transport and snapshot compatibility matrix before release planning.
 - [ ] Define compatibility matrix Calibration module version -> Registry descriptor -> Console adapter/report version and migration strategy; retain the old installed version and original immutable commit pin.
 - [ ] Keep a single documented CLI JSON contract for Console's inspect; library-only capabilities, candidate RI feature, OCCHI and test-only exporter must not be advertised as executable CLI verbs.
 - [ ] Review full report schema/context/source-digest checks, full bounded source tree provenance and explicit unsupported/unknown outcomes on the Console side; preserve non-actuating isolation.
