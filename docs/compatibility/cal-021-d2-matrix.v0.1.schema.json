@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openrgd:calibration:release-compatibility-matrix:v0.1-candidate",
+  "title": "CAL engineering compatibility matrix (non-installable planning evidence)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "snapshot_date",
+    "scope",
+    "module_id",
+    "publication_authorized",
+    "runtime_authority",
+    "actuation_enabled",
+    "registered_version",
+    "revisions",
+    "contracts",
+    "compatibility",
+    "proposed_package"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "cal.release-compatibility-matrix.v0.1-candidate"
+    },
+    "snapshot_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "scope": {
+      "const": "engineering_evidence_only"
+    },
+    "module_id": {
+      "const": "org.openrgd.calibration"
+    },
+    "publication_authorized": {
+      "const": false
+    },
+    "runtime_authority": {
+      "const": false
+    },
+    "actuation_enabled": {
+      "const": false
+    },
+    "registered_version": {
+      "const": "0.2.0"
+    },
+    "revisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calibration_legacy",
+        "calibration_d1_tested",
+        "calibration_d1_merge",
+        "registry",
+        "console_released",
+        "console_candidate",
+        "core",
+        "ri_candidate"
+      ],
+      "properties": {
+        "calibration_legacy": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "calibration_d1_tested": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "calibration_d1_merge": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "registry": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "console_released": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "console_candidate": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "core": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "ri_candidate": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_schema",
+        "profile_schema",
+        "passive_report",
+        "console_legacy_inspection",
+        "console_legacy_wrapper",
+        "canonical_identity",
+        "ri_association",
+        "canonical_hash_profile"
+      ],
+      "properties": {
+        "registry_schema": {
+          "const": "0.1.0-candidate"
+        },
+        "profile_schema": {
+          "const": "0.1.0"
+        },
+        "passive_report": {
+          "const": "0.2.0"
+        },
+        "console_legacy_inspection": {
+          "const": "console.passive-calibration.v0.4b"
+        },
+        "console_legacy_wrapper": {
+          "const": "console.calibration-inspection.v0.4b"
+        },
+        "canonical_identity": {
+          "const": "cal.canonical-identity.v0.1-candidate"
+        },
+        "ri_association": {
+          "const": "cal.ri-observation-association.v0.1-candidate"
+        },
+        "canonical_hash_profile": {
+          "const": "OPENRGD_SOURCE_TREE_SHA256_V1"
+        }
+      }
+    },
+    "compatibility": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "cal_source",
+          "package_version",
+          "consumer",
+          "status",
+          "evidence",
+          "limits"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "released_pair",
+              "old_consumer_new_source",
+              "hardened_consumer_legacy",
+              "hardened_consumer_d1",
+              "new_package_legacy_wrapper",
+              "new_package_new_consumer"
+            ]
+          },
+          "cal_source": {
+            "enum": [
+              "calibration_legacy",
+              "calibration_d1_tested",
+              null
+            ]
+          },
+          "package_version": {
+            "enum": [
+              "0.2.0",
+              "0.2.1"
+            ]
+          },
+          "consumer": {
+            "enum": [
+              "console_released",
+              "console_candidate",
+              null
+            ]
+          },
+          "status": {
+            "enum": [
+              "registered_legacy",
+              "offline_test_only",
+              "incompatible_version_discriminator",
+              "planned_untested"
+            ]
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^https://github\\.com/OpenRGD/"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "limits": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "proposed_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "source_commit",
+        "registry_descriptor",
+        "publication_state",
+        "host_targets",
+        "report_version",
+        "profile_schema_version",
+        "default_features",
+        "cli_command",
+        "permissions_required",
+        "selection_policy",
+        "legacy_wrapper_policy",
+        "new_wrapper_policy",
+        "profile_policy",
+        "canonical_identity_policy",
+        "ri_policy"
+      ],
+      "properties": {
+        "version": {
+          "const": "0.2.1"
+        },
+        "source_commit": {
+          "const": null
+        },
+        "registry_descriptor": {
+          "const": null
+        },
+        "publication_state": {
+          "const": "not_prepared"
+        },
+        "host_targets": {
+          "const": [
+            "linux-x86_64"
+          ]
+        },
+        "report_version": {
+          "const": "0.2.0"
+        },
+        "profile_schema_version": {
+          "const": "0.1.0"
+        },
+        "default_features": {
+          "const": []
+        },
+        "cli_command": {
+          "const": "inspect"
+        },
+        "permissions_required": {
+          "const": []
+        },
+        "selection_policy": {
+          "const": "explicit_exact_version_no_fallback"
+        },
+        "legacy_wrapper_policy": {
+          "const": "preserve_v0.4b_exact_0.2.0"
+        },
+        "new_wrapper_policy": {
+          "const": "new_versioned_owner_contract_required"
+        },
+        "profile_policy": {
+          "const": "read_only_revalidation_new_revision_only"
+        },
+        "canonical_identity_policy": {
+          "const": "optional_separate_sidecar"
+        },
+        "ri_policy": {
+          "const": "opt_in_candidate_only"
+        }
+      }
+    }
+  }
+}

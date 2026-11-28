@@ -1,0 +1,56 @@
+name: CAL-021-D.2 Version strategy
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  version-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-modules
+          ref: 0268b3748042d04fd3561553616388368881e04a
+          path: _d2/registry
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-console
+          ref: a0ef857cf425c1bb14ad8f62acec21f8c1324866
+          path: _d2/console-released
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-console
+          ref: 168e99c2ba057ae78bfe4cbde7465c222eaa84de
+          path: _d2/console-candidate
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: 81700401e2fa6d370a86b6c1f5a48802bc5f1fc7
+          path: _d2/cal-legacy
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: 253de500a9ecc9827adddb1b0f20dea249efe7f1
+          path: _d2/cal-d1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install 'jsonschema[format]==4.23.0'
+      - name: Verify version matrix and isolated synthetic multi-version Registry
+        run: |
+          python -B scripts/test_d2_version_strategy.py \
+            --registry _d2/registry \
+            --console-released _d2/console-released \
+            --console-candidate _d2/console-candidate \
+            --calibration-legacy _d2/cal-legacy \
+            --calibration-d1-merge _d2/cal-d1

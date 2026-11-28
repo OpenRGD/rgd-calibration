@@ -1,6 +1,6 @@
 # CAL-021-D.1 — Cross-Repository Reconciliation
 
-**Candidate engineering review — 2026-11-27.** All three CAL-021-C owner returns received and reconciled. This wave adds independent cross-repository regression tests and documents the decisions. It does not promote a candidate interface to a standard, change a runtime contract or distribute a new module.
+**Candidate engineering review — 2026-11-27.** All three CAL-021-C owner returns received and reconciled. D.1 merged in [PR #11](https://github.com/OpenRGD/rgd-calibration/pull/11) at 253de500a9ecc9827adddb1b0f20dea249efe7f1 after ten successful CI workflows on the reviewed head. See [D.2 versioning strategy](CAL_021_D2_COMPATIBILITY_VERSIONING.md) for subsequent planning. This wave adds independent cross-repository regression tests and documents the decisions. It does not promote a candidate interface to a standard, change a runtime contract or distribute a new module.
 
 ## Immutable evidence and revisions
 
