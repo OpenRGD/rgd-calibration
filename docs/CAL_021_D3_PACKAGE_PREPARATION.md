@@ -1,6 +1,6 @@
 # CAL-021-D.3 — Package Preparation
 
-**Source package candidate, 28 November 2026.** D.2 is merged in [PR #12](https://github.com/OpenRGD/rgd-calibration/pull/12) at 68f5b855e10d4549f639c5044d99951f6a61b78e; D.3 prepares 0.2.1, without publishing it to the Registry, crates.io or a GitHub release.
+**Source package candidate, 28 November 2026.** Merged in [PR #13](https://github.com/OpenRGD/rgd-calibration/pull/13) at f912a961f55bb051022eadc25e1ebd8b95e8f4ef after 14 green workflows. The accepted, independently built head 292d42aab5e04392b736693233811734bffb603e remains the exact D.4 test pin; no new catalog entry. See [D.4 integration](CAL_021_D4_INTEGRATION_MIGRATION.md). D.2 is merged in [PR #12](https://github.com/OpenRGD/rgd-calibration/pull/12) at 68f5b855e10d4549f639c5044d99951f6a61b78e; D.3 prepares 0.2.1, without publishing it to the Registry, crates.io or a GitHub release.
 
 ## Package identity
 

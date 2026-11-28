@@ -113,7 +113,7 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 
 ## P0 — CAL-0.2.1: Console/Registry readiness and contract hardening
 
-**Wave status (2026-11-28):** A/B/C/D.1/D.2 merged in Calibration source; all three owner returns reconciled. [D.3 package preparation candidate](CAL_021_D3_PACKAGE_PREPARATION.md) aligns source version 0.2.1; D.4/E/F remain gated. Historical [D.2 matrix](CAL_021_D2_COMPATIBILITY_VERSIONING.md) is not a live release catalog. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
+**Wave status (2026-11-28):** A/B/C/D.1/D.2/D.3 merged in Calibration source; all three owner returns reconciled. Source package 0.2.1 accepted without publication. [D.4 integration and migration plan](CAL_021_D4_INTEGRATION_MIGRATION.md) separates isolated installer verification, owner consumer work and final acceptance; E/F remain gated. Historical [D.2 matrix](CAL_021_D2_COMPATIBILITY_VERSIONING.md) is not a live release catalog. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
 
 **Why first:** guided/active calibration is premature until the first module can reliably inspect a real imported RGD bundle without claiming false identity or measurements.
 
@@ -153,8 +153,11 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 - [x] D.2: Document the version axes, exact-pair compatibility matrix, legacy/next version boundary and explicit selection/migration policy; [strategy](CAL_021_D2_COMPATIBILITY_VERSIONING.md).
 - [x] D.2: Review and merge [PR #12](https://github.com/OpenRGD/rgd-calibration/pull/12) at 68f5b855e10d4549f639c5044d99951f6a61b78e after all 12 CI runs; no release authorized.
 - [x] D.3: Prepare aligned Cargo.toml, Cargo.lock, module.openrgd.json version 0.2.1 and document the exact CLI/metadata contract; only inspect is an operational command.
-- [ ] D.3: Review real locked release build, version/schema checks, negative CLI cases and exact artifact digest evidence on the candidate commit; no registry publication or version-aware Console claim.
-- [ ] D.4: Establish explicitly version-aware Console/Agent contract and parallel-install/rollback behavior with Registry owner. Keep legacy wrapper and old descriptor/pin intact; no implicit fallback.
+- [x] D.3: Review real locked release build, version/schema checks, negative CLI cases and exact artifact digest evidence; [PR #13](https://github.com/OpenRGD/rgd-calibration/pull/13) merged at f912a961f55bb051022eadc25e1ebd8b95e8f4ef after 14 green workflows. No Registry publication or version-aware Console claim.
+- [ ] D.4A: Review isolated real Registry install/build, exact selection, tamper/rollback and legacy profile characterization on CAL PR CI. No installer mock, no live host claim.
+- [ ] D.4B: Registry owner return: additive candidate descriptor review, generated index and publication/ledger policy; preserve the original immutable 0.2.0 pin. No catalog publication until explicitly accepted.
+- [ ] D.4C: Console owner return: version-aware API/Agent contract, legacy wrapper, separate new selector, mixed-version rejection and historical preview behavior; coordinate integrated RC #24.
+- [ ] D.4D: Reconcile owner return pins and repeat actual integrated consumer/installer tests before E. No implicit fallback or production activation.
 - [ ] Review full report schema/context/source-digest checks, full bounded source tree provenance and explicit unsupported/unknown outcomes on the Console side; preserve non-actuating isolation.
 - [ ] Prepare coordinated new-version proposal and install/upgrade plan in reviewable PRs; do not distribute or replace CAL-0.2.0 until D/E/F gates are accepted.
 
