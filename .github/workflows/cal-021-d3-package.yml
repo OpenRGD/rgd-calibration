@@ -1,0 +1,56 @@
+name: CAL-021-D.3 Package preparation
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact candidate source (not synthetic PR merge)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-modules
+          ref: 0268b3748042d04fd3561553616388368881e04a
+          path: _d3/registry
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: 68f5b855e10d4549f639c5044d99951f6a61b78e
+          path: _d3/baseline
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Match the current Console Module Agent build toolchain version.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.90.0"
+      - name: Install local schema validation dependencies
+        run: python -m pip install 'jsonschema[format]==4.23.0'
+      - name: Locked release builds (no RI feature)
+        run: |
+          cargo build --release --locked --manifest-path _d3/baseline/Cargo.toml --bin rgd-calibration
+          cargo build --release --locked --bin rgd-calibration
+      - name: Verify package and stage unsigned review artifact
+        run: |
+          python -B scripts/test_d3_package.py \
+            --registry _d3/registry --baseline _d3/baseline \
+            --binary target/release/rgd-calibration \
+            --baseline-binary _d3/baseline/target/release/rgd-calibration \
+            --out _d3/review-artifact
+          (cd _d3/review-artifact && sha256sum -c SHA256SUMS)
+      - name: Retain candidate CI evidence (not release or installable catalog)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cal-0.2.1-unsigned-review-${{ github.run_id }}-${{ github.run_attempt }}
+          path: _d3/review-artifact/
+          if-no-files-found: error
+          retention-days: 30

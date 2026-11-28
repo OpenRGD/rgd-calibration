@@ -1,6 +1,6 @@
 # OpenRGD Calibration
 
-**CAL-0.2 — Passive Calibration (candidate)** • **CAL-0.1 — Foundation merged**
+**CAL-0.2.1 — Package candidate (not published in Registry)** • **Passive report 0.2.0 / profile schema 0.1.0**
 
 An independent, offline-first Rust module for calibration profile provenance, metrology records, and **read-only inspection** of an OpenRGD robot model. It never connects to actuators and never writes corrections into the Canonical Core. Calibration is not homing, and loading a description cannot move a robot.
 
@@ -12,7 +12,7 @@ The [OCCHI stereo experiment (PR #4)](https://github.com/OpenRGD/rgd-calibration
 
 The **[Calibration Master Development Checklist](docs/CALIBRATION_MASTER_CHECKLIST.md)** is the source of truth for completed milestones, next steps, quality gates and cross-repository dependencies. CAL-0.1/0.2 are merged and CI-verified; guided sessions, host-level Console acceptance, active calibration and continuous drift monitoring are not yet complete.
 
-**CAL-0.2.1 development status:** [A — bundle/parser](docs/CAL_021_A_BUNDLE_COMPATIBILITY.md), [B — canonical identity](docs/CAL_021_B_CANONICAL_IDENTITY.md) and [C — contract conformance](docs/CAL_021_C_CONTRACT_VALIDATION.md) are merged as source changes. [Owner response register and remaining release gates](docs/CAL_021_ABC_CONSOLIDATION.md). [D.1 owner reconciliation](docs/CAL_021_D1_RECONCILIATION.md) is merged. [D.2 compatibility matrix and version strategy](docs/CAL_021_D2_COMPATIBILITY_VERSIONING.md) are a candidate engineering plan; package 0.2.1 is not yet prepared or published. The Registry still distributes the original CAL-0.2.0 pin; D/E/F are not released.
+**CAL-0.2.1 development status:** [A — bundle/parser](docs/CAL_021_A_BUNDLE_COMPATIBILITY.md), [B — canonical identity](docs/CAL_021_B_CANONICAL_IDENTITY.md) and [C — contract conformance](docs/CAL_021_C_CONTRACT_VALIDATION.md) are merged as source changes. [Owner response register and remaining release gates](docs/CAL_021_ABC_CONSOLIDATION.md). [D.1 owner reconciliation](docs/CAL_021_D1_RECONCILIATION.md) is merged. [D.2 compatibility matrix and version strategy](docs/CAL_021_D2_COMPATIBILITY_VERSIONING.md) are merged. [D.3 package preparation](docs/CAL_021_D3_PACKAGE_PREPARATION.md) prepares the 0.2.1 source package for review, without publishing it. The Registry still distributes the original CAL-0.2.0 pin; D/E/F are not released.
 
 ## Candidate RI checks (explicit opt-in)
 
@@ -25,7 +25,10 @@ RI PR #4 is still upstream Draft and the Registry remains pinned to CAL-0.2.0. N
 
 ## Quick start
 
+The [CLI contract](docs/CLI_CONTRACT.md) distinguishes the package version from the passive report ABI. `--version` is metadata only; `inspect` remains the only operational command. The registered 0.2.0 binary does not implement the new metadata flag.
+
 ```bash
+cargo run --locked --bin rgd-calibration -- --version
 cargo test --all-targets --locked
 
 # Inspect a locally cloned canonical OpenRGD repository:
@@ -64,7 +67,7 @@ cargo run --locked --bin rgd-calibration -- inspect \
 - `src/source.rs`: bounded, local JSON/JSONC reader.
 - `src/passive.rs`: candidate CAL-0.2 coverage and consistency report. Contract: `contracts/passive-report.v0.2.schema.json`.
 - `src/bin/rgd-calibration.rs`: explicit operator-invoked offline CLI.
-- `module.openrgd.json`: **proposal-only** module manifest. This does not imply a functional Module Registry.
+- `module.openrgd.json`: **proposal-only** module manifest for the 0.2.1 candidate. Registry still selects the immutable 0.2.0 source; no new descriptor or publication is implied.
 - `tests/`: synthetic tests only, never physical evidence.
 - `docs/PASSIVE_CALIBRATION.md`: limitations, reconciliation and mapping details.
 

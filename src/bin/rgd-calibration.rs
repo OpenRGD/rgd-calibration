@@ -89,6 +89,12 @@ fn run() -> Result<(), CalibrationError> {
 }
 
 fn main() {
+    // Metadata only. No bundle, registry, device or profile is opened.
+    let mut args = env::args().skip(1);
+    if args.next().as_deref() == Some("--version") && args.next().is_none() {
+        println!("rgd-calibration {}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
     if let Err(error) = run() {
         eprintln!("CAL-0.2 inspection error: {error}");
         std::process::exit(2);
