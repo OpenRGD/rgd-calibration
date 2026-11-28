@@ -12,7 +12,7 @@ The [OCCHI stereo experiment (PR #4)](https://github.com/OpenRGD/rgd-calibration
 
 The **[Calibration Master Development Checklist](docs/CALIBRATION_MASTER_CHECKLIST.md)** is the source of truth for completed milestones, next steps, quality gates and cross-repository dependencies. CAL-0.1/0.2 are merged and CI-verified; guided sessions, host-level Console acceptance, active calibration and continuous drift monitoring are not yet complete.
 
-**CAL-0.2.1 development status:** [A — bundle/parser](docs/CAL_021_A_BUNDLE_COMPATIBILITY.md), [B — canonical identity](docs/CAL_021_B_CANONICAL_IDENTITY.md) and [C — contract conformance](docs/CAL_021_C_CONTRACT_VALIDATION.md) are merged as source changes. [Owner response register and remaining release gates](docs/CAL_021_ABC_CONSOLIDATION.md). The Registry still distributes the original CAL-0.2.0 pin; D/E/F are not released.
+**CAL-0.2.1 development status:** [A — bundle/parser](docs/CAL_021_A_BUNDLE_COMPATIBILITY.md), [B — canonical identity](docs/CAL_021_B_CANONICAL_IDENTITY.md) and [C — contract conformance](docs/CAL_021_C_CONTRACT_VALIDATION.md) are merged as source changes. [Owner response register and remaining release gates](docs/CAL_021_ABC_CONSOLIDATION.md). [D.1 owner reconciliation](docs/CAL_021_D1_RECONCILIATION.md) is merged. [D.2 compatibility matrix and version strategy](docs/CAL_021_D2_COMPATIBILITY_VERSIONING.md) are a candidate engineering plan; package 0.2.1 is not yet prepared or published. The Registry still distributes the original CAL-0.2.0 pin; D/E/F are not released.
 
 ## Candidate RI checks (explicit opt-in)
 

@@ -7,7 +7,7 @@ This file is a brief milestone index. The checklist contains acceptance gates, d
 | --- | --- | --- |
 | CAL-0.1 | Rust foundation, immutable profiles, lifecycle, structural evidence | **Merged / CI verified** |
 | CAL-0.2 | Passive Core inspection, coverage, read-only proposal, CLI JSON | **Merged / CI verified** |
-| CAL-0.2.1 | Console/Registry interoperability hardening | **A/B/C merged; D.1 reconciliation candidate; D.2–D.4/E/F open** — [D.1 status](CAL_021_D1_RECONCILIATION.md) |
+| CAL-0.2.1 | Console/Registry interoperability hardening | **A/B/C/D.1 merged; D.2 strategy candidate; D.3/D.4/E/F open** — [D.2 matrix](CAL_021_D2_COMPATIBILITY_VERSIONING.md) |
 | CAL-RI-01 | RI consumer-reference sidecar (CAL PR #5, RI PR #4 upstream) | **Merged as opt-in Rust feature**; upstream RI Draft; no runtime authority |
 | CAL-0.3 OCCHI | Optional experimental stereo/OpenCV tooling (CAL PR #4) | **Merged as isolated experiment**; no physical verification or module release |
 | CAL-0.3A | Offline guided session engine and typed metrology contracts | Planned |

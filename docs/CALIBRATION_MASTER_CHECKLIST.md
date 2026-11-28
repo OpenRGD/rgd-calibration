@@ -1,6 +1,6 @@
 # OpenRGD Calibration — Master Development Checklist
 
-**Status reviewed:** 2026-11-27  
+**Status reviewed:** 2026-11-28  
 **Scope:** `OpenRGD/rgd-calibration` (Rust, offline-first, hardware-agnostic) and its versioned contracts with Canonical Core, Module Registry, Console, Chronograf/Chronon and Somatic Runtime.  
 **Rule:** `[x]` means verified in the existing source/CI **for that scope only**; `[ ]` means not yet proven or implemented. Passing synthetic tests never constitutes a physical robot calibration.
 
@@ -113,7 +113,7 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 
 ## P0 — CAL-0.2.1: Console/Registry readiness and contract hardening
 
-**Wave status (2026-11-27):** A/B/C merged in Calibration source; all three owner returns reviewed. [D.1 reconciliation candidate](CAL_021_D1_RECONCILIATION.md) precedes D.2 compatibility planning; E/F remain gated. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
+**Wave status (2026-11-28):** A/B/C/D.1 merged in Calibration source; all three owner returns reconciled. [D.2 compatibility/versioning proposal](CAL_021_D2_COMPATIBILITY_VERSIONING.md) is ready for its independent review and CI; D.3/D.4/E/F remain gated. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
 
 **Why first:** guided/active calibration is premature until the first module can reliably inspect a real imported RGD bundle without claiming false identity or measurements.
 
@@ -149,10 +149,11 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 ### CAL-021-D — Registry & Console Compatibility
 
 - [x] D.1: Review the three owner returns, exact revisions and disposition in [CAL-021-D.1](CAL_021_D1_RECONCILIATION.md).
-- [ ] D.1: Accept the new candidate reconciliation after CI on the reviewable PR, retaining all A/B/C historical pins.
-- [ ] D.2: Review cross-repository version/transport and snapshot compatibility matrix before release planning.
-- [ ] Define compatibility matrix Calibration module version -> Registry descriptor -> Console adapter/report version and migration strategy; retain the old installed version and original immutable commit pin.
-- [ ] Keep a single documented CLI JSON contract for Console's inspect; library-only capabilities, candidate RI feature, OCCHI and test-only exporter must not be advertised as executable CLI verbs.
+- [x] D.1: Candidate reconciliation merged in [PR #11](https://github.com/OpenRGD/rgd-calibration/pull/11) after 10 green workflows, retaining all A/B/C historical pins.
+- [x] D.2: Document the version axes, exact-pair compatibility matrix, legacy/next version boundary and explicit selection/migration policy; [strategy](CAL_021_D2_COMPATIBILITY_VERSIONING.md).
+- [ ] D.2: Review the planning matrix and independent offline tests; merge only after CI and review. No actual release is authorized.
+- [ ] D.3: Prepare Cargo.toml, Cargo.lock, module.openrgd.json version 0.2.1 at an immutable commit; retain report 0.2.0 only if regression-compatible. Keep a single documented CLI inspect contract; library-only capabilities, RI, OCCHI and test exporter must not be advertised as CLI verbs.
+- [ ] D.4: Establish explicitly version-aware Console/Agent contract and parallel-install/rollback behavior with Registry owner. Keep legacy wrapper and old descriptor/pin intact; no implicit fallback.
 - [ ] Review full report schema/context/source-digest checks, full bounded source tree provenance and explicit unsupported/unknown outcomes on the Console side; preserve non-actuating isolation.
 - [ ] Prepare coordinated new-version proposal and install/upgrade plan in reviewable PRs; do not distribute or replace CAL-0.2.0 until D/E/F gates are accepted.
 

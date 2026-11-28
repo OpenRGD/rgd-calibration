@@ -1,0 +1,106 @@
+{
+  "schema_version": "cal.release-compatibility-matrix.v0.1-candidate",
+  "snapshot_date": "2026-11-28",
+  "scope": "engineering_evidence_only",
+  "module_id": "org.openrgd.calibration",
+  "publication_authorized": false,
+  "runtime_authority": false,
+  "actuation_enabled": false,
+  "registered_version": "0.2.0",
+  "revisions": {
+    "calibration_legacy": "81700401e2fa6d370a86b6c1f5a48802bc5f1fc7",
+    "calibration_d1_tested": "f609f827322a3142ba75e8a36a5279bb87fc606e",
+    "calibration_d1_merge": "253de500a9ecc9827adddb1b0f20dea249efe7f1",
+    "registry": "0268b3748042d04fd3561553616388368881e04a",
+    "console_released": "a0ef857cf425c1bb14ad8f62acec21f8c1324866",
+    "console_candidate": "168e99c2ba057ae78bfe4cbde7465c222eaa84de",
+    "core": "afe1a831b950a4e6560f0285a0103fc4eaa343b7",
+    "ri_candidate": "563d923cd65805a2fc40b431635241871720932f"
+  },
+  "contracts": {
+    "registry_schema": "0.1.0-candidate",
+    "profile_schema": "0.1.0",
+    "passive_report": "0.2.0",
+    "console_legacy_inspection": "console.passive-calibration.v0.4b",
+    "console_legacy_wrapper": "console.calibration-inspection.v0.4b",
+    "canonical_identity": "cal.canonical-identity.v0.1-candidate",
+    "ri_association": "cal.ri-observation-association.v0.1-candidate",
+    "canonical_hash_profile": "OPENRGD_SOURCE_TREE_SHA256_V1"
+  },
+  "compatibility": [
+    {
+      "id": "released_pair",
+      "cal_source": "calibration_legacy",
+      "package_version": "0.2.0",
+      "consumer": "console_released",
+      "status": "registered_legacy",
+      "evidence": "https://github.com/OpenRGD/rgd-calibration/pull/2",
+      "limits": "Existing registered release; prior consumer contract, no new host acceptance."
+    },
+    {
+      "id": "old_consumer_new_source",
+      "cal_source": "calibration_d1_tested",
+      "package_version": "0.2.0",
+      "consumer": "console_released",
+      "status": "offline_test_only",
+      "evidence": "https://github.com/OpenRGD/rgd-calibration/actions/runs/45806326568",
+      "limits": "Historical tests on C head, whose runtime source is unchanged at D.1. Old consumer gaps remain."
+    },
+    {
+      "id": "hardened_consumer_legacy",
+      "cal_source": "calibration_legacy",
+      "package_version": "0.2.0",
+      "consumer": "console_candidate",
+      "status": "offline_test_only",
+      "evidence": "https://github.com/OpenRGD/rgd-calibration/actions/runs/46048542205",
+      "limits": "Actual Agent with injected Registry resolution; legacy syntax intersection."
+    },
+    {
+      "id": "hardened_consumer_d1",
+      "cal_source": "calibration_d1_tested",
+      "package_version": "0.2.0",
+      "consumer": "console_candidate",
+      "status": "offline_test_only",
+      "evidence": "https://github.com/OpenRGD/rgd-calibration/actions/runs/46048542205",
+      "limits": "Actual Agent with injected Registry resolution; candidate source not independently published."
+    },
+    {
+      "id": "new_package_legacy_wrapper",
+      "cal_source": null,
+      "package_version": "0.2.1",
+      "consumer": "console_candidate",
+      "status": "incompatible_version_discriminator",
+      "evidence": null,
+      "limits": "Existing wrapper and API allow only 0.2.0; must not relabel new binary."
+    },
+    {
+      "id": "new_package_new_consumer",
+      "cal_source": null,
+      "package_version": "0.2.1",
+      "consumer": null,
+      "status": "planned_untested",
+      "evidence": null,
+      "limits": "D.3/D.4 produce package and reviewed explicit-version consumer; E/F require acceptance."
+    }
+  ],
+  "proposed_package": {
+    "version": "0.2.1",
+    "source_commit": null,
+    "registry_descriptor": null,
+    "publication_state": "not_prepared",
+    "host_targets": [
+      "linux-x86_64"
+    ],
+    "report_version": "0.2.0",
+    "profile_schema_version": "0.1.0",
+    "default_features": [],
+    "cli_command": "inspect",
+    "permissions_required": [],
+    "selection_policy": "explicit_exact_version_no_fallback",
+    "legacy_wrapper_policy": "preserve_v0.4b_exact_0.2.0",
+    "new_wrapper_policy": "new_versioned_owner_contract_required",
+    "profile_policy": "read_only_revalidation_new_revision_only",
+    "canonical_identity_policy": "optional_separate_sidecar",
+    "ri_policy": "opt_in_candidate_only"
+  }
+}
