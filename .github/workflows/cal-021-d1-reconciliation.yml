@@ -42,6 +42,14 @@ jobs:
           ref: 81700401e2fa6d370a86b6c1f5a48802bc5f1fc7
           path: _d1/legacy-cal
           persist-credentials: false
+      # Preserve the reviewed 0.2.0 source/consumer experiment. Never label
+      # the future 0.2.1 executable as 0.2.0 in the legacy wrapper.
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: f609f827322a3142ba75e8a36a5279bb87fc606e
+          path: _d1/cal-reviewed
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -51,12 +59,12 @@ jobs:
       - name: Build the released and candidate passive CLIs and candidate test-only probe
         run: |
           cargo build --locked --manifest-path _d1/legacy-cal/Cargo.toml --bin rgd-calibration
-          cargo build --locked --bin rgd-calibration
-          cargo build --locked --features ri-candidate --example contract_exchange
+          cargo build --locked --manifest-path _d1/cal-reviewed/Cargo.toml --bin rgd-calibration
+          cargo build --locked --manifest-path _d1/cal-reviewed/Cargo.toml --features ri-candidate --example contract_exchange
       - name: Reconcile owner candidates with actual pinned code
         run: |
-          python -B scripts/test_d1_reconciliation.py \
+          python -B _d1/cal-reviewed/scripts/test_d1_reconciliation.py \
             --core _d1/core --console _d1/console --registry _d1/registry \
             --ri _d1/ri --legacy-cal _d1/legacy-cal \
             --legacy-binary _d1/legacy-cal/target/debug/rgd-calibration \
-            --binary target/debug/rgd-calibration --probe target/debug/examples/contract_exchange
+            --binary _d1/cal-reviewed/target/debug/rgd-calibration --probe _d1/cal-reviewed/target/debug/examples/contract_exchange

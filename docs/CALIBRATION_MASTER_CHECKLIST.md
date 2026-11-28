@@ -113,7 +113,7 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 
 ## P0 — CAL-0.2.1: Console/Registry readiness and contract hardening
 
-**Wave status (2026-11-28):** A/B/C/D.1 merged in Calibration source; all three owner returns reconciled. [D.2 compatibility/versioning proposal](CAL_021_D2_COMPATIBILITY_VERSIONING.md) is ready for its independent review and CI; D.3/D.4/E/F remain gated. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
+**Wave status (2026-11-28):** A/B/C/D.1/D.2 merged in Calibration source; all three owner returns reconciled. [D.3 package preparation candidate](CAL_021_D3_PACKAGE_PREPARATION.md) aligns source version 0.2.1; D.4/E/F remain gated. Historical [D.2 matrix](CAL_021_D2_COMPATIBILITY_VERSIONING.md) is not a live release catalog. See [historical consolidation register](CAL_021_ABC_CONSOLIDATION.md). The distribution registry remains on CAL-0.2.0 (81700401e2fa6d370a86b6c1f5a48802bc5f1fc7). No software release, consumer deployment, canonical contract promotion or physical acceptance follows from these merges.
 
 **Why first:** guided/active calibration is premature until the first module can reliably inspect a real imported RGD bundle without claiming false identity or measurements.
 
@@ -151,8 +151,9 @@ A merged candidate **does not** turn RI's independent [Draft PR #4](https://gith
 - [x] D.1: Review the three owner returns, exact revisions and disposition in [CAL-021-D.1](CAL_021_D1_RECONCILIATION.md).
 - [x] D.1: Candidate reconciliation merged in [PR #11](https://github.com/OpenRGD/rgd-calibration/pull/11) after 10 green workflows, retaining all A/B/C historical pins.
 - [x] D.2: Document the version axes, exact-pair compatibility matrix, legacy/next version boundary and explicit selection/migration policy; [strategy](CAL_021_D2_COMPATIBILITY_VERSIONING.md).
-- [ ] D.2: Review the planning matrix and independent offline tests; merge only after CI and review. No actual release is authorized.
-- [ ] D.3: Prepare Cargo.toml, Cargo.lock, module.openrgd.json version 0.2.1 at an immutable commit; retain report 0.2.0 only if regression-compatible. Keep a single documented CLI inspect contract; library-only capabilities, RI, OCCHI and test exporter must not be advertised as CLI verbs.
+- [x] D.2: Review and merge [PR #12](https://github.com/OpenRGD/rgd-calibration/pull/12) at 68f5b855e10d4549f639c5044d99951f6a61b78e after all 12 CI runs; no release authorized.
+- [x] D.3: Prepare aligned Cargo.toml, Cargo.lock, module.openrgd.json version 0.2.1 and document the exact CLI/metadata contract; only inspect is an operational command.
+- [ ] D.3: Review real locked release build, version/schema checks, negative CLI cases and exact artifact digest evidence on the candidate commit; no registry publication or version-aware Console claim.
 - [ ] D.4: Establish explicitly version-aware Console/Agent contract and parallel-install/rollback behavior with Registry owner. Keep legacy wrapper and old descriptor/pin intact; no implicit fallback.
 - [ ] Review full report schema/context/source-digest checks, full bounded source tree provenance and explicit unsupported/unknown outcomes on the Console side; preserve non-actuating isolation.
 - [ ] Prepare coordinated new-version proposal and install/upgrade plan in reviewable PRs; do not distribute or replace CAL-0.2.0 until D/E/F gates are accepted.

@@ -36,6 +36,14 @@ jobs:
           ref: 161318d2897d07d5628ef502cafba1c7c489fff0
           path: _interop/ri
           persist-credentials: false
+      # Preserve the reviewed 0.2.0 source/consumer experiment. Never label
+      # the future 0.2.1 executable as 0.2.0 in the legacy wrapper.
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: 646dbc05bcefd15942b25bb55b3c99096f0cccc9
+          path: _interop/cal-reviewed
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -44,12 +52,12 @@ jobs:
         run: python -m pip install 'jsonschema[format]==4.23.0' 'typer>=0.9.0' 'rich>=13.0.0'
       - name: Build default CLI and opt-in test fixture
         run: |
-          cargo build --locked --bin rgd-calibration
-          cargo build --locked --features ri-candidate --example contract_exchange
+          cargo build --locked --manifest-path _interop/cal-reviewed/Cargo.toml --bin rgd-calibration
+          cargo build --locked --manifest-path _interop/cal-reviewed/Cargo.toml --features ri-candidate --example contract_exchange
       - name: Validate actual exchanged contracts (offline execution)
         run: |
-          python3 scripts/test_contract_exchange.py \
+          python3 _interop/cal-reviewed/scripts/test_contract_exchange.py \
             --core _interop/core --console _interop/console \
             --registry _interop/registry --ri _interop/ri \
-            --binary target/debug/rgd-calibration \
-            --probe target/debug/examples/contract_exchange
+            --binary _interop/cal-reviewed/target/debug/rgd-calibration \
+            --probe _interop/cal-reviewed/target/debug/examples/contract_exchange
